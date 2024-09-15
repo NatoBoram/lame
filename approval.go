@@ -13,5 +13,8 @@ func (r *Approval) Marshal() ([]byte, error) {
 }
 
 type Approval struct {
-	Explanation string `json:"explanation"`
+	Someone      string `json:"someone"`
+	Something    string `json:"something"`
+	Consequences string `json:"consequences"`
+	Explanation  string `json:"explanation"`
 }

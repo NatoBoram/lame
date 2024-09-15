@@ -32,6 +32,18 @@ var modFunctions = []openai.FunctionDefinition{{
 	Parameters: jsonschema.Definition{
 		Type: jsonschema.Object,
 		Properties: map[string]jsonschema.Definition{
+			"someone": {
+				Type:        jsonschema.String,
+				Description: "The name of the person who voted for, supported or wanted to impose something on other people.",
+			},
+			"something": {
+				Type:        jsonschema.String,
+				Description: "The thing that the person voted for, supported or wanted to impose on other people.",
+			},
+			"consequences": {
+				Type:        jsonschema.String,
+				Description: "The consequences of the thing that the person voted for, supported or wanted to impose on other people.",
+			},
 			"explanation": {
 				Type: jsonschema.String,
 				Description: `Fill in the tags in the following sentences and make sure they are consistent:
@@ -41,6 +53,6 @@ var modFunctions = []openai.FunctionDefinition{{
 Do not deviate from this template.`,
 			},
 		},
-		Required: []string{"explanation"},
+		Required: []string{"someone", "something", "consequences", "explanation"},
 	},
 }}

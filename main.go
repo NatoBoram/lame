@@ -174,9 +174,18 @@ Explanatory comment: %s`, post.Post.Title, postBody, commentBody)
 
 func approve(approval Approval) error {
 	fmt.Printf(`Recommendation: %s
+Someone: %s
+Something: %s
+Consequences: %s
 Explanation: %s
 
-`, aurora.Green("Approve"), aurora.Gray(12, approval.Explanation))
+`,
+		aurora.Green("Approve"),
+		aurora.Gray(6, approval.Someone),
+		aurora.Gray(6, approval.Something),
+		aurora.Gray(6, approval.Consequences),
+		aurora.Gray(12, approval.Explanation),
+	)
 
 	return nil
 }

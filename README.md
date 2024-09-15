@@ -23,18 +23,34 @@ Currently, only links in the form of `https://www.reddit.com/r/LeopardsAteMyFace
 ## Example
 
 ```log
-Enter a Reddit post url: https://www.reddit.com/r/LeopardsAteMyFace/comments/1fdx25e/minnesota_restaurant_owner_confronts_don_jr/
+Enter a Reddit post url: https://www.reddit.com/r/LeopardsAteMyFace/comments/1f81eyd/men_who_argued_that_anyone_involved_in_abortion/
 
-Title: Minnesota Restaurant Owner Confronts Don Jr. Because He Lost Half His Customers Over Trump Support
+Title: Men who argued that "anyone involved in abortion were sinners" ... and now in areas that banned abortions ... are realizing that they messed up when their wife's health is threatened and can't get abortion health care.
 Body:
-URL: https://www.yahoo.com/news/don-jr-confronted-podcast-restaurant-222601407.html
+URL: https://www.washingtonpost.com/nation/2024/09/03/abortion-bans-pregnancy-miscarriage-men/
 
 Found comment by u/AutoModerator
-Found explanatory comment by u/Humble_Novice
-Body: 1. Restaurant owner Allen Brenycz had purchased a digital billboard expressing his support for Donald Trump.
-2. But because of this billboard, he ended up losing over half of his customers.
-3. The restaurant owner then confronts Don Jr. on his podcast out of frustration over the whole thing.
+Found explanatory comment by u/Lighting
+Body: 1. People who wanted to remove Medical Power of Attorney without due process (e.g. ban abortion) succeeded in many red states.
+
+2. They succeeded and now they live in states where abortion is banned.
+
+3. Now "red states" means the rivers of blood from the increased maternal mortality/morbidity from their policies and finding that death/disease/infertility is threatening the lives of women they know personally. Oops.
+
+From the article:
+
+&gt; Thomas Stovall grew up in a strict Baptist family in Mississippi and always believed that anyone involved with abortion was destined for hell.
+&gt;
+&gt; But his lifelong conviction crumbled when his wife, Chelsea, was 20 weeks pregnant with their third child. Tests showed a severely malformed and underdeveloped fetus, one that was sure to be stillborn if carried to term. There was other devastating news, too. Continuing with the pregnancy could threaten Chelsea’s health and future fertility, doctors warned.
+&gt;
+&gt; The couple live in Arkansas, which has a near-total ban on abortion and is surrounded by states with their own highly restrictive laws. So they drove 400 miles to reach a clinic in Illinois where they could end the pregnancy. As they did, Stovall says he’d decided he was “dead wrong about abortion being a sin.”
 
 Recommendation: Approve
-Explanation: Allen Brenycz voted for, supported or wanted to impose support for Donald Trump on other people. Support for Donald Trump has the consequences of losing over half of his customers. As a consequence of supporting Donald Trump, losing over half of his customers happened to Allen Brenycz.
+Someone: Thomas Stovall
+Something: anti-abortion policies
+Consequences: the increased maternal mortality/morbidity resulting from anti-abortion policies in red states
+Explanation: **Thomas Stovall** voted for, supported or wanted to impose **anti-abortion policies** on **other people**. **Anti-abortion policies** have the consequences of **the increased maternal mortality/morbidity resulting from these policies**. As a consequence of **anti-abortion policies**, **the increased maternal mortality/morbidity resulting from these policies** happened to **Thomas Stovall**.
+
+You can "approve", "remove" (no removal reason) or skip (default): a
+Approved!
 ```

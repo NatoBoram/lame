@@ -1,3 +1,7 @@
+// Lame is a LLM-powered verification tool for explanatory comments in
+// [r/LeopardsAteMyFace].
+//
+// [r/LeopardsAteMyFace]: https://www.reddit.com/r/LeopardsAteMyFace
 package main
 
 import (
@@ -28,8 +32,15 @@ func main() {
 		panic(err)
 	}
 
-	redditCredentials := reddit.Credentials{ID: redCreds.ID, Secret: redCreds.Secret, Username: redCreds.Username, Password: redCreds.Password}
-	ua := fmt.Sprintf("%s:%s:%s (by /u/NatoBoram)", runtime.GOOS, packageName, version)
+	redditCredentials := reddit.Credentials{
+		ID: redCreds.ID, Secret: redCreds.Secret,
+		Username: redCreds.Username, Password: redCreds.Password,
+	}
+
+	ua := fmt.Sprintf("%s:%s:%s (by /u/NatoBoram)",
+		runtime.GOOS, packageName, version,
+	)
+
 	opts := reddit.WithUserAgent(ua)
 	redditClient, err := reddit.NewClient(redditCredentials, opts)
 	if err != nil {
@@ -42,7 +53,9 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Logged in as %s\n", aurora.Red("u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name))
+	fmt.Printf("Logged in as %s\n",
+		aurora.Red("u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name),
+	)
 
 	openaiCreds, err := readOpenAiCredentials(dir)
 	if err != nil {
@@ -59,7 +72,9 @@ func main() {
 
 }
 
-func mainLoop(ctx context.Context, redditClient *reddit.Client, openaiClient *openai.Client) error {
+func mainLoop(ctx context.Context,
+	redditClient *reddit.Client, openaiClient *openai.Client,
+) error {
 	fmt.Print("Enter a Reddit post url: ")
 
 	reader := bufio.NewReader(os.Stdin)

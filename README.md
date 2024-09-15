@@ -1,6 +1,6 @@
 # Leopards Ate My Explanation
 
-[![Go](https://github.com/NatoBoram/lame/actions/workflows/go.yml/badge.svg)](https://github.com/NatoBoram/lame/actions/workflows/go.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/NatoBoram/lame)](https://goreportcard.com/report/github.com/NatoBoram/lame)
+[![Go](https://github.com/NatoBoram/lame/actions/workflows/go.yml/badge.svg)](https://github.com/NatoBoram/lame/actions/workflows/go.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/NatoBoram/lame)](https://goreportcard.com/report/github.com/NatoBoram/lame) [![Go Reference](https://pkg.go.dev/badge/github.com/NatoBoram/lame.svg)](https://pkg.go.dev/github.com/NatoBoram/lame)
 
 A LLM-powered verification tool for explanatory comments in [r/LeopardsAteMyFace](https://www.reddit.com/r/LeopardsAteMyFace).
 

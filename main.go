@@ -42,7 +42,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Logged in as %s\n", aurora.Red(user.Name))
+	fmt.Printf("Logged in as %s\n", aurora.Red("u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name))
 
 	openaiCreds, err := readOpenAiCredentials(dir)
 	if err != nil {
@@ -68,7 +68,7 @@ func mainLoop(ctx context.Context, redditClient *reddit.Client, openaiClient *op
 		return fmt.Errorf("failed to read input: %w", err)
 	}
 
-	postId, err := getPostId(url)
+	postId, err := GetPostId(url)
 	if err != nil {
 		return fmt.Errorf("failed to get post id: %w", err)
 	}
@@ -83,29 +83,40 @@ Title: %s
 Body: %s
 URL: %s
 
-`, aurora.Bold(post.Post.Title), aurora.Gray(12, post.Post.Body), post.Post.URL)
+`,
+		aurora.Bold(post.Post.Title).Hyperlink(PermaLink(post.Post.Permalink)),
+		aurora.Gray(12, post.Post.Body),
+		aurora.Italic(post.Post.URL),
+	)
 
-	automodComment, err := findAutomodComment(post)
+	automodComment, err := FindAutomodComment(post)
 	if err != nil {
 		return fmt.Errorf("failed to find AutoModerator comment: %w", err)
 	}
 
-	fmt.Printf("Found comment by %s\n", aurora.Green("u/AutoModerator"))
+	fmt.Printf("Found %s by %s\n",
+		aurora.Hyperlink("comment", PermaLink(automodComment.Permalink)),
+		aurora.Green("u/"+automodComment.Author).Hyperlink("https://reddit.com/u/"+automodComment.Author),
+	)
 
 	_, err = redditClient.Comment.LoadMoreReplies(ctx, automodComment)
 	if err != nil {
 		return fmt.Errorf("failed to load more replies: %w", err)
 	}
 
-	opReply, err := findExplanatoryComment(post, automodComment)
+	opReply, err := FindExplanatoryComment(post, automodComment)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf(`Found explanatory comment by %s
+	fmt.Printf(`Found %s by %s
 Body: %s
 
-`, aurora.Red("u/"+opReply.Author), aurora.Gray(12, opReply.Body))
+`,
+		aurora.Hyperlink("explanatory comment", PermaLink(opReply.Permalink)),
+		aurora.Red("u/"+opReply.Author).Hyperlink("https://reddit.com/u/"+opReply.Author),
+		aurora.Gray(12, opReply.Body),
+	)
 
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model: "gpt-3.5-turbo",

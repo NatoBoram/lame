@@ -22,7 +22,7 @@ func TestGetPostId(t *testing.T) {
 
 func TestPermaLink(t *testing.T) {
 	permalink := "/r/LeopardsAteMyFace/comments/lt8zlq/a_guide_to_this_subs_explanatory_comment_rule/"
-	expected := "https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq/a_guide_to_this_subs_explanatory_comment_rule/"
+	expected := "https://reddit.com/r/LeopardsAteMyFace/comments/lt8zlq/a_guide_to_this_subs_explanatory_comment_rule/"
 	actual := PermaLink(permalink)
 
 	if actual != expected {

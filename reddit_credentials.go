@@ -104,7 +104,7 @@ func verifyRedditCredentials(creds RedditCredentials) error {
 	}
 
 	if len(list) > 0 {
-		return fmt.Errorf("the following credentials are missing: %v", list)
+		return fmt.Errorf("the following Reddit credentials are missing: %v", list)
 	}
 
 	return nil

@@ -7,9 +7,13 @@ import (
 	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
-func getPostId(url string) (string, error) {
-	// Get the `lt8zlq` out of a full POST URL like this:
-	// https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq/a_guide_to_this_subs_explanatory_comment_rule
+// AutoModeratorID is the user ID of u/AutoModerator.
+const AutoModeratorID = "t2_6l4z3"
+
+// GetPostId gets the `lt8zlq` out of a full POST URL like this:
+//
+// https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq/a_guide_to_this_subs_explanatory_comment_rule
+func GetPostId(url string) (string, error) {
 
 	segments := strings.Split(url, "/")
 	index := 0
@@ -26,7 +30,8 @@ func getPostId(url string) (string, error) {
 	return "", fmt.Errorf("failed to get post id from url: %s", url)
 }
 
-func findAutomodComment(post *reddit.PostAndComments) (*reddit.Comment, error) {
+// FindAutomodComment finds the first top-level comment made by u/AutoModerator.
+func FindAutomodComment(post *reddit.PostAndComments) (*reddit.Comment, error) {
 	for _, comment := range post.Comments {
 		if comment.Author == "AutoModerator" {
 			return comment, nil
@@ -36,7 +41,8 @@ func findAutomodComment(post *reddit.PostAndComments) (*reddit.Comment, error) {
 	return nil, fmt.Errorf("failed to find u/AutoModerator comment")
 }
 
-func findExplanatoryComment(post *reddit.PostAndComments, automodComment *reddit.Comment) (*reddit.Comment, error) {
+// FindExplanatoryComment finds the first reply made by the post author under u/AutoModerator's request for an explanatory comment.
+func FindExplanatoryComment(post *reddit.PostAndComments, automodComment *reddit.Comment) (*reddit.Comment, error) {
 	for _, comment := range automodComment.Replies.Comments {
 		if comment.AuthorID == post.Post.AuthorID && comment.ParentID == fmt.Sprintf("t1_%s", automodComment.ID) {
 			return comment, nil
@@ -44,4 +50,9 @@ func findExplanatoryComment(post *reddit.PostAndComments, automodComment *reddit
 	}
 
 	return nil, fmt.Errorf("failed to find the explanatory comment")
+}
+
+// PermaLink converts a Reddit "permalink" to a full URL.
+func PermaLink(permalink string) string {
+	return "https://reddit.com" + permalink
 }

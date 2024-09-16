@@ -53,12 +53,9 @@ func main() {
 		panic(err)
 	}
 
-	_, err = fmt.Printf("Logged in as %s\n",
+	fmt.Printf("Logged in as %s\n",
 		aurora.Red("u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name),
 	)
-	if err != nil {
-		panic(err)
-	}
 
 	openaiCreds, err := readOpenAiCredentials(dir)
 	if err != nil {
@@ -78,10 +75,7 @@ func main() {
 func mainLoop(ctx context.Context,
 	redditClient *reddit.Client, openaiClient *openai.Client,
 ) error {
-	_, err := fmt.Print("Enter a Reddit post url: ")
-	if err != nil {
-		return fmt.Errorf("failed to print prompt: %w", err)
-	}
+	fmt.Print("Enter a Reddit post url: ")
 
 	reader := bufio.NewReader(os.Stdin)
 	url, err := reader.ReadString('\n')
@@ -99,7 +93,7 @@ func mainLoop(ctx context.Context,
 		return fmt.Errorf("failed to get post: %w", err)
 	}
 
-	_, err = fmt.Printf(`
+	fmt.Printf(`
 Title: %s
 Body: %s
 URL: %s
@@ -109,34 +103,25 @@ URL: %s
 		aurora.Gray(12, post.Post.Body),
 		aurora.Italic(post.Post.URL),
 	)
-	if err != nil {
-		return fmt.Errorf("failed to print post: %w", err)
-	}
 
 	automodComment, err := FindAutomodComment(post)
 	if err != nil {
 		return fmt.Errorf("failed to find AutoModerator comment: %w", err)
 	}
 
-	_, err = fmt.Printf("Found %s by %s\n",
+	fmt.Printf("Found %s by %s\n",
 		aurora.Hyperlink("comment", PermaLink(automodComment.Permalink)),
 		aurora.Green("u/"+automodComment.Author).Hyperlink("https://reddit.com/u/"+automodComment.Author),
 	)
-	if err != nil {
-		return fmt.Errorf("failed to print u/AutoModerator's comment: %w", err)
-	}
 
-	_, err = redditClient.Comment.LoadMoreReplies(ctx, automodComment)
-	if err != nil {
-		return fmt.Errorf("failed to load more replies: %w", err)
-	}
+	redditClient.Comment.LoadMoreReplies(ctx, automodComment)
 
 	opReply, err := FindExplanatoryComment(post, automodComment)
 	if err != nil {
 		return err
 	}
 
-	_, err = fmt.Printf(`Found %s by %s
+	fmt.Printf(`Found %s by %s
 Body: %s
 
 `,
@@ -144,14 +129,11 @@ Body: %s
 		aurora.Red("u/"+opReply.Author).Hyperlink("https://reddit.com/u/"+opReply.Author),
 		aurora.Gray(12, opReply.Body),
 	)
-	if err != nil {
-		return fmt.Errorf("failed to print explanatory comment: %w", err)
-	}
 
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model: "gpt-3.5-turbo",
 		Messages: []openai.ChatCompletionMessage{
-			{Role: openai.ChatMessageRoleAssistant, Content: automodComment.Body},
+			{Role: openai.ChatMessageRoleAssistant, Content: systemMessage},
 			{Role: openai.ChatMessageRoleUser, Content: makeUserContext(post, opReply)},
 		},
 		Functions: modFunctions,
@@ -160,26 +142,33 @@ Body: %s
 		return fmt.Errorf("failed to create chat completion: %w", err)
 	}
 
+	if len(resp.Choices) == 0 {
+		prettyPrint(resp)
+		return fmt.Errorf("no response from OpenAI")
+	}
+
+	if resp.Choices[0].Message.FunctionCall == nil {
+		prettyPrint(resp)
+		return fmt.Errorf("no function call in response")
+	}
+
 	switch resp.Choices[0].Message.FunctionCall.Name {
 	case "approve":
 		approval, e := UnmarshalApproval([]byte(resp.Choices[0].Message.FunctionCall.Arguments))
 		if e != nil {
 			return fmt.Errorf("failed to unmarshal approval: %w", e)
 		}
-		err = suggestApprove(approval)
+		suggestApprove(approval)
 
 	case "remove":
 		removal, e := UnmarshalRemoval([]byte(resp.Choices[0].Message.FunctionCall.Arguments))
 		if e != nil {
 			return fmt.Errorf("failed to unmarshal removal: %w", e)
 		}
-		err = suggestRemove(removal)
-	}
-	if err != nil {
-		return err
+		suggestRemove(removal)
 	}
 
-	_, err = fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s %s: ",
+	fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s %s: ",
 
 		aurora.Underline("a").Green(),
 		aurora.Green("pprove"),
@@ -204,10 +193,7 @@ Body: %s
 			return fmt.Errorf("failed to approve post: %w", err)
 		}
 
-		_, err = fmt.Println("Approved!")
-		if err != nil {
-			return fmt.Errorf("failed to print approval message: %w", err)
-		}
+		fmt.Println("Approved!")
 
 	case "r", "remove":
 		_, err := redditClient.Moderation.Remove(ctx, post.Post.FullID)
@@ -215,42 +201,48 @@ Body: %s
 			return fmt.Errorf("failed to remove post: %w", err)
 		}
 
-		_, err = fmt.Println("Removed!")
-		if err != nil {
-			return fmt.Errorf("failed to print removal message: %w", err)
-		}
+		fmt.Println("Removed!")
 
 	case "", "s", "skip":
-		_, err = fmt.Println("Skipping...")
-		if err != nil {
-			return fmt.Errorf("failed to print skip message: %w", err)
-		}
+		fmt.Println("Skipping...")
 
 	default:
-		_, err = fmt.Println("Invalid input. Skipping...")
-		if err != nil {
-			return fmt.Errorf("failed to print invalid input message: %w", err)
-		}
+		fmt.Println("Invalid input. Skipping...")
 	}
 
-	_, err = fmt.Println()
-	if err != nil {
-		return fmt.Errorf("failed to print newline: %w", err)
-	}
-
+	fmt.Println()
 	return err
 }
 
 func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) string {
-	postBody := strings.Join(strings.Split(post.Post.Body, "\n"), "\t")
-	commentBody := strings.Join(strings.Split(opReply.Body, "\n"), "\t")
-	return fmt.Sprintf(`Post title: %s
-Post body: %s
-Explanatory comment: %s`, post.Post.Title, postBody, commentBody)
+	message := ""
+
+	if post.Post.Title != "" {
+		message += fmt.Sprintf(`
+<post_title>
+%s
+</post_title>`, post.Post.Title)
+	}
+
+	if post.Post.Body != "" {
+		message += fmt.Sprintf(`
+<post_body>
+%s
+</post_body>`, post.Post.Body)
+	}
+
+	if opReply.Body != "" {
+		message += fmt.Sprintf(`
+<explanatory_comment>
+%s
+</explanatory_comment>`, opReply.Body)
+	}
+
+	return message
 }
 
-func suggestApprove(approval Approval) error {
-	_, err := fmt.Printf(`Recommendation: %s
+func suggestApprove(approval Approval) {
+	fmt.Printf(`Recommendation: %s
 Someone: %s
 Something: %s
 Consequences: %s
@@ -258,30 +250,18 @@ Explanation: %s
 
 `,
 		aurora.Green("Approve"),
-		aurora.Gray(6, approval.Someone),
-		aurora.Gray(6, approval.Something),
-		aurora.Gray(6, approval.Consequences),
+		aurora.Gray(9, approval.Someone),
+		aurora.Gray(9, approval.Something),
+		aurora.Gray(9, approval.Consequences),
 		aurora.Gray(12, approval.Explanation),
 	)
-
-	if err != nil {
-		return fmt.Errorf("failed to suggest approval of a post: %w", err)
-	}
-
-	return err
 }
 
-func suggestRemove(removal Removal) error {
-	_, err := fmt.Printf(`Recommendation: %s
+func suggestRemove(removal Removal) {
+	fmt.Printf(`Recommendation: %s
 Reason: %s
 
 `, aurora.Red("Remove"), removal.Reason)
-
-	if err != nil {
-		return fmt.Errorf("failed to suggest removal of a post: %w", err)
-	}
-
-	return err
 }
 
 func prettyPrint(i interface{}) error {
@@ -290,10 +270,6 @@ func prettyPrint(i interface{}) error {
 		return fmt.Errorf("failed to marshal JSON: %w", err)
 	}
 
-	_, err = fmt.Println(string(s))
-	if err != nil {
-		return fmt.Errorf("failed to print JSON: %w", err)
-	}
-
+	fmt.Println(string(s))
 	return err
 }

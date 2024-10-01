@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	github.com/logrusorgru/aurora/v4 v4.0.0
-	github.com/sashabaranov/go-openai v1.29.2
+	github.com/sashabaranov/go-openai v1.31.0
 	github.com/vartanbeno/go-reddit/v2 v2.0.1
 )
 

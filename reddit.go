@@ -38,7 +38,7 @@ func FindAutomodComment(post *reddit.PostAndComments) (*reddit.Comment, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("failed to find u/AutoModerator comment")
+	return nil, fmt.Errorf("u/AutoModerator's comment was not in the first comment page")
 }
 
 // FindExplanatoryComment finds the first reply made by the post author under u/AutoModerator's request for an explanatory comment.

@@ -134,7 +134,9 @@ URL: %s
 	opReply, err := FindExplanatoryComment(post, automodComment)
 	if err != nil {
 		fmt.Printf("Failed to find explanatory comment: %v\n", err)
-	} else {
+	}
+
+	if opReply != nil {
 
 		_, err = fmt.Printf(`Found %s by %s
 Body: %s
@@ -161,23 +163,9 @@ Body: %s
 		return fmt.Errorf("failed to create chat completion: %w", err)
 	}
 
-	switch resp.Choices[0].Message.FunctionCall.Name {
-	case "approve":
-		approval, e := UnmarshalApproval([]byte(resp.Choices[0].Message.FunctionCall.Arguments))
-		if e != nil {
-			return fmt.Errorf("failed to unmarshal approval: %w", e)
-		}
-		err = suggestApprove(approval)
-
-	case "remove":
-		removal, e := UnmarshalRemoval([]byte(resp.Choices[0].Message.FunctionCall.Arguments))
-		if e != nil {
-			return fmt.Errorf("failed to unmarshal removal: %w", e)
-		}
-		err = suggestRemove(removal)
-	}
+	_, removal, err := suggest(resp)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to suggest approval or removal: %w", err)
 	}
 
 	_, err = fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s %s: ",
@@ -200,6 +188,7 @@ Body: %s
 
 	switch strings.TrimSpace(input) {
 	case "a", "approve":
+		fmt.Println("Approving...")
 		_, err := redditClient.Moderation.Approve(ctx, post.Post.FullID)
 		if err != nil {
 			return fmt.Errorf("failed to approve post: %w", err)
@@ -211,15 +200,32 @@ Body: %s
 		}
 
 	case "r", "remove":
+		fmt.Println("Removing...")
 		_, err := redditClient.Moderation.Remove(ctx, post.Post.FullID)
 		if err != nil {
 			return fmt.Errorf("failed to remove post: %w", err)
 		}
 
-		_, err = fmt.Println("Removed!")
-		if err != nil {
-			return fmt.Errorf("failed to print removal message: %w", err)
+		if removal != nil {
+			removalMessage, err := formatRemovalMessage(removal.Reason)
+			if err != nil {
+				return fmt.Errorf("failed to format removal message: %w", err)
+			}
+
+			fmt.Println("Adding removal reason...")
+			removalComment, _, err := redditClient.Comment.Submit(ctx, post.Post.FullID, removalMessage)
+			if err != nil {
+				return fmt.Errorf("failed to submit removal reason: %w", err)
+			}
+
+			fmt.Println("Distinguishing and stickying removal reason...")
+			_, err = redditClient.Moderation.DistinguishAndSticky(ctx, removalComment.ID)
+			if err != nil {
+				return fmt.Errorf("failed to distinguish and sticky removal reason: %w", err)
+			}
 		}
+
+		fmt.Println("Removed!")
 
 	case "", "s", "skip":
 		_, err = fmt.Println("Skipping...")
@@ -256,41 +262,6 @@ func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) stri
 	return fmt.Sprintf(`Post title: %s
 Post body: %s
 Explanatory comment: %s`, post.Post.Title, postBody, commentBody)
-}
-
-func suggestApprove(approval Approval) error {
-	_, err := fmt.Printf(`Recommendation: %s
-Someone: %s
-Something: %s
-Consequences: %s
-Explanation: %s
-
-`,
-		aurora.Green("Approve"),
-		aurora.Gray(6, approval.Someone),
-		aurora.Gray(6, approval.Something),
-		aurora.Gray(6, approval.Consequences),
-		aurora.Gray(12, approval.Explanation),
-	)
-
-	if err != nil {
-		return fmt.Errorf("failed to suggest approval of a post: %w", err)
-	}
-
-	return err
-}
-
-func suggestRemove(removal Removal) error {
-	_, err := fmt.Printf(`Recommendation: %s
-Reason: %s
-
-`, aurora.Red("Remove"), removal.Reason)
-
-	if err != nil {
-		return fmt.Errorf("failed to suggest removal of a post: %w", err)
-	}
-
-	return err
 }
 
 func prettyPrint(i interface{}) error {

@@ -16,5 +16,4 @@ type Approval struct {
 	Someone      string `json:"someone"`
 	Something    string `json:"something"`
 	Consequences string `json:"consequences"`
-	Explanation  string `json:"explanation"`
 }

@@ -49,7 +49,7 @@ func FindExplanatoryComment(post *reddit.PostAndComments, automodComment *reddit
 		}
 	}
 
-	return nil, fmt.Errorf("failed to find the explanatory comment")
+	return nil, fmt.Errorf("there is no explanatory comment")
 }
 
 // PermaLink converts a Reddit "permalink" to a full URL.

@@ -133,19 +133,20 @@ URL: %s
 
 	opReply, err := FindExplanatoryComment(post, automodComment)
 	if err != nil {
-		return err
-	}
+		fmt.Printf("Failed to find explanatory comment: %v\n", err)
+	} else {
 
-	_, err = fmt.Printf(`Found %s by %s
+		_, err = fmt.Printf(`Found %s by %s
 Body: %s
 
 `,
-		aurora.Hyperlink("explanatory comment", PermaLink(opReply.Permalink)),
-		aurora.Red("u/"+opReply.Author).Hyperlink("https://reddit.com/u/"+opReply.Author),
-		aurora.Gray(12, opReply.Body),
-	)
-	if err != nil {
-		return fmt.Errorf("failed to print explanatory comment: %w", err)
+			aurora.Hyperlink("explanatory comment", PermaLink(opReply.Permalink)),
+			aurora.Red("u/"+opReply.Author).Hyperlink("https://reddit.com/u/"+opReply.Author),
+			aurora.Gray(12, opReply.Body),
+		)
+		if err != nil {
+			return fmt.Errorf("failed to print explanatory comment: %w", err)
+		}
 	}
 
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
@@ -241,9 +242,17 @@ Body: %s
 	return err
 }
 
+func formatExplanatoryComment(opReply *reddit.Comment) string {
+	if opReply == nil {
+		return ""
+	}
+
+	return strings.Join(strings.Split(opReply.Body, "\n"), "\t")
+}
+
 func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) string {
 	postBody := strings.Join(strings.Split(post.Post.Body, "\n"), "\t")
-	commentBody := strings.Join(strings.Split(opReply.Body, "\n"), "\t")
+	commentBody := formatExplanatoryComment(opReply)
 	return fmt.Sprintf(`Post title: %s
 Post body: %s
 Explanatory comment: %s`, post.Post.Title, postBody, commentBody)

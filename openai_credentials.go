@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/sashabaranov/go-openai"
 )
 
 func UnmarshalOpenAiCredentials(data []byte) (OpenAiCredentials, error) {
@@ -20,6 +22,10 @@ func (r *OpenAiCredentials) Marshal() ([]byte, error) {
 
 type OpenAiCredentials struct {
 	Token string `json:"Token"`
+	// BaseURL for OpenAI is https://api.openai.com/v1
+	BaseURL string `json:"BaseURL"`
+	// Model defaults to gpt-3.5-turbo
+	Model string `json:"Model"`
 }
 
 func readOpenAiCredentials(configDir string) (OpenAiCredentials, error) {
@@ -63,12 +69,22 @@ func verifyOpenAiCredentials(creds OpenAiCredentials) error {
 		return fmt.Errorf("OpenAI token is empty")
 	}
 
+	if creds.BaseURL == "" {
+		return fmt.Errorf("BaseURL is empty")
+	}
+
+	if creds.Model == "" {
+		return fmt.Errorf("Model is empty")
+	}
+
 	return nil
 }
 
 func createOpenaiCredentials(credsPath string) error {
 	creds := OpenAiCredentials{
-		Token: "",
+		Token:   "",
+		BaseURL: openaiAPIURLv1,
+		Model:   openai.GPT3Dot5Turbo,
 	}
 
 	bytes, err := creds.Marshal()
@@ -88,3 +104,5 @@ func createOpenaiCredentials(credsPath string) error {
 
 	return err
 }
+
+const openaiAPIURLv1 = "https://api.openai.com/v1"

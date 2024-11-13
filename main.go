@@ -64,10 +64,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	openaiClient := openai.NewClient(openaiCreds.Token)
+	config := openai.DefaultConfig(openaiCreds.Token)
+	config.BaseURL = openaiCreds.BaseURL
+	openaiClient := openai.NewClientWithConfig(config)
 
 	for {
-		err := mainLoop(ctx, redditClient, openaiClient)
+		err := mainLoop(ctx, redditClient, openaiClient, openaiCreds.Model)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -76,7 +78,8 @@ func main() {
 }
 
 func mainLoop(ctx context.Context,
-	redditClient *reddit.Client, openaiClient *openai.Client,
+	redditClient *reddit.Client,
+	openaiClient *openai.Client, model string,
 ) error {
 	_, err := fmt.Print("Enter a Reddit post url: ")
 	if err != nil {
@@ -152,12 +155,12 @@ Body: %s
 	}
 
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-		Model: "gpt-3.5-turbo",
+		Model: model,
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleAssistant, Content: automodComment.Body},
 			{Role: openai.ChatMessageRoleUser, Content: makeUserContext(post, opReply)},
 		},
-		Functions: modFunctions,
+		Tools: modTools,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create chat completion: %w", err)
@@ -168,6 +171,7 @@ Body: %s
 		return fmt.Errorf("failed to suggest approval or removal: %w", err)
 	}
 
+	promptRemoval := reasonOrNone(removal)
 	_, err = fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s %s: ",
 
 		aurora.Underline("a").Green(),
@@ -175,7 +179,7 @@ Body: %s
 
 		aurora.Underline("r").Red(),
 		aurora.Red("emove"),
-		aurora.Gray(12, "(no removal reason)"),
+		aurora.Gray(12, promptRemoval),
 
 		aurora.Gray(12, "skip"),
 		aurora.Gray(12, "(default)"),
@@ -246,6 +250,14 @@ Body: %s
 	}
 
 	return err
+}
+
+func reasonOrNone(removal *Removal) string {
+	if removal == nil {
+		return "(no removal reason)"
+	}
+
+	return fmt.Sprintf("(%s)", removal.Reason)
 }
 
 func formatExplanatoryComment(opReply *reddit.Comment) string {

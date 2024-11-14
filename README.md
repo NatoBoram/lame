@@ -48,4 +48,4 @@ Only links in the form of `https://www.reddit.com/r/LeopardsAteMyFace/comments/l
 
 ## Example
 
-![image](https://github.com/user-attachments/assets/ecd6b2e8-2cc5-44a1-b867-8d1c38dba3c8)
+![Example image of what it looks like to use it](https://github.com/user-attachments/assets/48a44e8d-75bb-4a79-81b7-0457226975fe)

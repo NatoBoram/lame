@@ -53,12 +53,9 @@ func main() {
 		panic(err)
 	}
 
-	_, err = fmt.Printf("Logged in as %s\n",
+	fmt.Printf("Logged in as %s\n",
 		aurora.Red("u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name),
 	)
-	if err != nil {
-		panic(err)
-	}
 
 	openaiCreds, err := readOpenAiCredentials(dir)
 	if err != nil {
@@ -109,7 +106,7 @@ func mainLoop(ctx context.Context,
 		return fmt.Errorf("failed to get post: %w", err)
 	}
 
-	_, err = fmt.Printf(`
+	fmt.Printf(`
 Title: %s
 Body: %s
 URL: %s
@@ -119,22 +116,16 @@ URL: %s
 		aurora.Gray(12, post.Post.Body),
 		aurora.Italic(post.Post.URL),
 	)
-	if err != nil {
-		return fmt.Errorf("failed to print post: %w", err)
-	}
 
 	automodComment, err := FindAutomodComment(post)
 	if err != nil {
 		return fmt.Errorf("failed to find AutoModerator comment: %w", err)
 	}
 
-	_, err = fmt.Printf("Found %s by %s\n",
+	fmt.Printf("Found %s by %s\n",
 		aurora.Hyperlink("comment", PermaLink(automodComment.Permalink)),
 		aurora.Green("u/"+automodComment.Author).Hyperlink("https://reddit.com/u/"+automodComment.Author),
 	)
-	if err != nil {
-		return fmt.Errorf("failed to print u/AutoModerator's comment: %w", err)
-	}
 
 	_, err = redditClient.Comment.LoadMoreReplies(ctx, automodComment)
 	if err != nil {
@@ -147,8 +138,7 @@ URL: %s
 	}
 
 	if opReply != nil {
-
-		_, err = fmt.Printf(`Found %s by %s
+		fmt.Printf(`Found %s by %s
 Body: %s
 
 `,
@@ -156,9 +146,6 @@ Body: %s
 			aurora.Red("u/"+opReply.Author).Hyperlink("https://reddit.com/u/"+opReply.Author),
 			aurora.Gray(12, opReply.Body),
 		)
-		if err != nil {
-			return fmt.Errorf("failed to print explanatory comment: %w", err)
-		}
 	}
 
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
@@ -180,7 +167,7 @@ Body: %s
 	}
 
 	promptRemoval := reasonOrNone(removal)
-	_, err = fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s %s: ",
+	fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s %s: ",
 
 		aurora.Underline("a").Green(),
 		aurora.Green("pprove"),

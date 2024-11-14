@@ -4,6 +4,10 @@
 
 A LLM-powered verification tool for explanatory comments in [r/LeopardsAteMyFace](https://www.reddit.com/r/LeopardsAteMyFace).
 
+> [!IMPORTANT]
+>
+> Large language models are biaised towards positivity. They are probably going to refuse to remove anything.
+
 ## Installation
 
 ```sh

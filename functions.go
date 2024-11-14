@@ -46,18 +46,18 @@ var remove = openai.FunctionDefinition{
 				Type: jsonschema.String,
 				Description: `These are the removal reasons of the subreddit. If the post fits one of these, remove it.
 
-* The words "leopard", "ate", "face" and all their derivatives are forbidden in the title and explanatory comment.
-* "Bad explanatory comment" means it is impossible to reconcile the explanatory comment with the required information.
-* "No explanatory comment" means there's literally nothing in the explanatory comment. Do not approve posts without an explanatory comment.
-* "No consequences yet" is for when the stated consequences didn't actually happen yet.`,
+* The words "leopard", "ate", "face" and all their derivatives are forbidden in the title and in the explanatory comment.
+* This is not a subreddit of the future. The consequences must have already happened.
+* The enabler and the victim must be the same person.`,
 				Enum: []string{
 					// Removal reasons
 					string(ACTUAL_ANIMAL_ATTACK),
 					string(BAD_EXPLANATORY_COMMENT),
 					string(DIRECT_LINK_TO_OTHER_SUBREDDIT),
+					string(DISTINCT_ENABLER_AND_VICTIM),
 					string(DOES_NOT_FIT_THE_SUBREDDIT),
+					string(FUTURE_CONSEQUENCES),
 					string(LEOPARD_IN_TITLE_OR_EXPLANATORY_COMMENT),
-					string(NO_CONSEQUENCES_YET),
 					string(NO_EXPLANATORY_COMMENT),
 					string(UNCIVIL_BEHAVIOUR),
 

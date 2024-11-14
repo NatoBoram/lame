@@ -7,17 +7,17 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func suggest(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
+func toolName(resp openai.ChatCompletionResponse) *string {
 	if len(resp.Choices) == 0 {
 		fmt.Println("No suggestions.")
 		prettyPrint(resp)
-		return nil, nil, nil
+		return nil
 	}
 
 	if resp.Choices[0].Message.ToolCalls == nil {
 		fmt.Println("No tools were called.")
 		prettyPrint(resp)
-		return nil, nil, nil
+		return nil
 	}
 
 	if len(resp.Choices) > 1 {
@@ -30,6 +30,15 @@ func suggest(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
 		prettyPrint(resp)
 	}
 
+	return &resp.Choices[0].Message.ToolCalls[0].Function.Name
+}
+
+func toolCall(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
+	name := toolName(resp)
+	if name == nil {
+		return nil, nil, nil
+	}
+
 	function := resp.Choices[0].Message.ToolCalls[0].Function
 	switch function.Name {
 
@@ -38,8 +47,6 @@ func suggest(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
 		if err != nil {
 			return &approval, nil, fmt.Errorf("failed to unmarshal approval: %w", err)
 		}
-
-		suggestApprove(approval)
 		return &approval, nil, nil
 
 	case "remove":
@@ -47,12 +54,27 @@ func suggest(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
 		if err != nil {
 			return nil, &removal, fmt.Errorf("failed to unmarshal removal: %w", err)
 		}
-
-		suggestRemove(removal)
 		return nil, &removal, nil
 	}
 
-	return nil, nil, fmt.Errorf("unknown function: %s", function.Name)
+	return nil, nil, fmt.Errorf("unknown tool: %s", function.Name)
+}
+
+func suggest(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
+	approval, removal, error := toolCall(resp)
+	if error != nil {
+		return approval, removal, fmt.Errorf("failed to get tool call: %w", error)
+	}
+
+	if approval != nil {
+		suggestApprove(*approval)
+	}
+
+	if removal != nil {
+		suggestRemove(*removal)
+	}
+
+	return approval, removal, nil
 }
 
 func suggestApprove(approval Approval) {

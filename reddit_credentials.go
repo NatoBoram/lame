@@ -23,6 +23,9 @@ type RedditCredentials struct {
 	Secret   string `json:"Secret"`
 	Username string `json:"Username"`
 	Password string `json:"Password"`
+
+	// Guide to this sub's explanatory comment rule.
+	Guide string `json:"Guide"`
 }
 
 func readRedditCredentials(configDir string) (RedditCredentials, error) {
@@ -63,6 +66,7 @@ func createRedditCredentials(credsPath string) error {
 		Secret:   "",
 		Username: "",
 		Password: "",
+		Guide:    "lt8zlq",
 	}
 
 	data, err := creds.Marshal()
@@ -101,6 +105,10 @@ func verifyRedditCredentials(creds RedditCredentials) error {
 
 	if creds.Password == "" {
 		list = append(list, "Password")
+	}
+
+	if creds.Guide == "" {
+		list = append(list, "Guide")
 	}
 
 	if len(list) > 0 {

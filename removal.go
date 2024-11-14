@@ -28,3 +28,23 @@ const (
 	NO_EXPLANATORY_COMMENT                  RemovalReason = "no_explanatory_comment"
 	UNCIVIL_BEHAVIOUR                       RemovalReason = "uncivil_behaviour"
 )
+
+// Trapped flairs were used to easily identify kinds of posts that were not
+// allowed.
+const (
+	BYE_BYE_JOB         RemovalReason = "bye_bye_job"
+	HYPOCRISY           RemovalReason = "hypocrisy"
+	LESSER_OF_TWO_EVILS RemovalReason = "lesser_of_two_evils"
+	SELF_AWARE_WOLF     RemovalReason = "self_aware_wolf"
+	STUPIDITY           RemovalReason = "stupidity"
+	SUDDEN_BETRAYAL     RemovalReason = "sudden_betrayal"
+)
+
+var trappedFlairs = []RemovalReason{
+	BYE_BYE_JOB,
+	HYPOCRISY,
+	LESSER_OF_TWO_EVILS,
+	SELF_AWARE_WOLF,
+	STUPIDITY,
+	SUDDEN_BETRAYAL,
+}

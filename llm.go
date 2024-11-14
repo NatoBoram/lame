@@ -21,7 +21,7 @@ func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) stri
 		PostTitle:          post.Post.Title,
 		PostUrl:            post.Post.URL,
 		PostBody:           post.Post.Body,
-		ExplanatoryComment: opReply.Body,
+		ExplanatoryComment: formatOpReply(opReply),
 	}
 
 	contextXml, err := xml.Marshal(context)
@@ -30,6 +30,14 @@ func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) stri
 	}
 
 	return string(contextXml)
+}
+
+func formatOpReply(opReply *reddit.Comment) string {
+	if opReply == nil {
+		return ""
+	}
+
+	return opReply.Body
 }
 
 func retryRemovalReason(

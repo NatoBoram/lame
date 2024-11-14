@@ -26,6 +26,7 @@ const (
 	DOES_NOT_FIT_THE_SUBREDDIT              RemovalReason = "does_not_fit_the_subreddit"
 	FUTURE_CONSEQUENCES                     RemovalReason = "future_consequences"
 	LEOPARD_IN_TITLE_OR_EXPLANATORY_COMMENT RemovalReason = "leopard_in_title_or_explanatory_comment"
+	NO_CONSEQUENCES                         RemovalReason = "no_consequences"
 	NO_EXPLANATORY_COMMENT                  RemovalReason = "no_explanatory_comment"
 	UNCIVIL_BEHAVIOUR                       RemovalReason = "uncivil_behaviour"
 )

@@ -10,8 +10,9 @@ var reasonToRule = map[RemovalReason]string{
 	LEOPARD_IN_TITLE_OR_EXPLANATORY_COMMENT: "* **Rule 6 :** No \"Leopards ate my face\" in the title nor explanatory comment",
 	DIRECT_LINK_TO_OTHER_SUBREDDIT:          "* **Rule 7 :** No direct links to other subreddits",
 	BAD_EXPLANATORY_COMMENT:                 "* **Rule 3 :** Write an [explanatory comment](https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq)\n\nYou wrote a comment, but it wasn't an [explanation](https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq).",
-	FUTURE_CONSEQUENCES:                     "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThis is not a subreddit of the future. The consequences must have already happened.",
 	DISTINCT_ENABLER_AND_VICTIM:             "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThe enabler and the victim must be the same person.",
+	FUTURE_CONSEQUENCES:                     "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThis is not a subreddit of the future. The consequences must have already happened.",
+	NO_CONSEQUENCES:                         "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThere are no consequences in your post.",
 }
 
 func flairToRemovalReason(removalReason RemovalReason) RemovalReason {
@@ -39,7 +40,9 @@ func formatRemovalMessage(removalReason RemovalReason, model string) (string, er
 
 *This removal was LLM-assisted. See the source code at <https://github.com/NatoBoram/lame>. Model: %s.*
 
-*If you have any questions or concerns about this removal, please feel free to [message the moderators](https://www.reddit.com/message/compose/?to=/r/LeopardsAteMyFace) thru Modmail. Thanks!*`, rule, formattedModel)
+*If you have any questions or concerns about this removal, please feel free to [message the moderators](https://www.reddit.com/message/compose/?to=/r/LeopardsAteMyFace) thru Modmail. Thanks!*`,
+		rule, formattedModel,
+	)
 
 	return message, nil
 }

@@ -68,8 +68,14 @@ func main() {
 	config.BaseURL = openaiCreds.BaseURL
 	openaiClient := openai.NewClientWithConfig(config)
 
+	// A guide to this sub's explanatory comment rule.
+	guide, _, err := redditClient.Post.Get(ctx, redCreds.Guide)
+	if err != nil {
+		panic(err)
+	}
+
 	for {
-		err := mainLoop(ctx, redditClient, openaiClient, openaiCreds.Model)
+		err := mainLoop(ctx, redditClient, openaiClient, openaiCreds.Model, guide)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -80,6 +86,7 @@ func main() {
 func mainLoop(ctx context.Context,
 	redditClient *reddit.Client,
 	openaiClient *openai.Client, model string,
+	guide *reddit.PostAndComments,
 ) error {
 	_, err := fmt.Print("Enter a Reddit post url: ")
 	if err != nil {
@@ -157,7 +164,8 @@ Body: %s
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model: model,
 		Messages: []openai.ChatCompletionMessage{
-			{Role: openai.ChatMessageRoleAssistant, Content: automodComment.Body},
+			{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
+			{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Body},
 			{Role: openai.ChatMessageRoleUser, Content: makeUserContext(post, opReply)},
 		},
 		Tools: modTools,
@@ -204,14 +212,36 @@ Body: %s
 		}
 
 	case "r", "remove":
+		if removal == nil {
+			fmt.Println("Getting new removal reason...")
+			removal, err = retryRemovalReason(post, automodComment, opReply, ctx, model, openaiClient)
+			if err != nil {
+				fmt.Printf("Failed to get another removal reason: %v\n", err)
+			}
+
+			if removal != nil {
+				fmt.Printf("Got new removal reason: %s\n", removal.Reason)
+
+				ok, err := confirmNewRemovalReason()
+				if err != nil {
+					return fmt.Errorf("failed to confirm new removal reason: %w", err)
+				}
+				if !ok {
+					fmt.Println("Skipping...")
+					return nil
+				}
+			}
+		}
+
 		fmt.Println("Removing...")
 		_, err := redditClient.Moderation.Remove(ctx, post.Post.FullID)
 		if err != nil {
 			return fmt.Errorf("failed to remove post: %w", err)
 		}
+		fmt.Println("Removed!")
 
 		if removal != nil {
-			removalMessage, err := formatRemovalMessage(removal.Reason)
+			removalMessage, err := formatRemovalMessage(removal.Reason, model)
 			if err != nil {
 				return fmt.Errorf("failed to format removal message: %w", err)
 			}
@@ -221,15 +251,14 @@ Body: %s
 			if err != nil {
 				return fmt.Errorf("failed to submit removal reason: %w", err)
 			}
+			fmt.Printf("Removal reason added: %s\n", PermaLink(removalComment.Permalink))
 
 			fmt.Println("Distinguishing and stickying removal reason...")
-			_, err = redditClient.Moderation.DistinguishAndSticky(ctx, removalComment.ID)
+			_, err = redditClient.Moderation.DistinguishAndSticky(ctx, removalComment.FullID)
 			if err != nil {
 				return fmt.Errorf("failed to distinguish and sticky removal reason: %w", err)
 			}
 		}
-
-		fmt.Println("Removed!")
 
 	case "", "s", "skip":
 		_, err = fmt.Println("Skipping...")
@@ -252,28 +281,38 @@ Body: %s
 	return err
 }
 
+func confirmNewRemovalReason() (bool, error) {
+	fmt.Printf("Proceed with new removal reason? (%s%s/%s%s): ",
+		aurora.Underline("y").Green(),
+		aurora.Green("es"),
+
+		aurora.Underline("n").Red(),
+		aurora.Red("o"),
+	)
+
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		return false, fmt.Errorf("failed to read confirmation input: %w", err)
+	}
+
+	switch strings.TrimSpace(input) {
+	case "y", "yes":
+		return true, nil
+	case "n", "no":
+		return false, nil
+	default:
+		fmt.Println("Invalid input.")
+		return false, nil
+	}
+}
+
 func reasonOrNone(removal *Removal) string {
 	if removal == nil {
-		return "(no removal reason)"
+		return "(will fetch another removal reason)"
 	}
 
 	return fmt.Sprintf("(%s)", removal.Reason)
-}
-
-func formatExplanatoryComment(opReply *reddit.Comment) string {
-	if opReply == nil {
-		return ""
-	}
-
-	return strings.Join(strings.Split(opReply.Body, "\n"), "\t")
-}
-
-func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) string {
-	postBody := strings.Join(strings.Split(post.Post.Body, "\n"), "\t")
-	commentBody := formatExplanatoryComment(opReply)
-	return fmt.Sprintf(`Post title: %s
-Post body: %s
-Explanatory comment: %s`, post.Post.Title, postBody, commentBody)
 }
 
 func prettyPrint(i interface{}) error {

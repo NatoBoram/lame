@@ -23,18 +23,22 @@ func flairToRemovalReason(removalReason RemovalReason) RemovalReason {
 	return removalReason
 }
 
-func formatRemovalMessage(removalReason RemovalReason) (string, error) {
+func formatRemovalMessage(removalReason RemovalReason, model string) (string, error) {
 	reason := flairToRemovalReason(removalReason)
 	rule, ok := reasonToRule[reason]
 	if !ok {
 		return "", fmt.Errorf("no rule found for reason: %s", reason)
 	}
 
+	formattedModel := fmt.Sprintf("`%s`", model)
+
 	message := fmt.Sprintf(`Thank you for your submission! Unfortunately, it has been removed for the following reason:
 
 %s
 
-*If you have any questions or concerns about this removal, please feel free to [message the moderators](https://www.reddit.com/message/compose/?to=/r/LeopardsAteMyFace) thru Modmail. Thanks!*`, rule)
+*This removal was LLM-assisted. See the source code at <https://github.com/NatoBoram/lame>. Model: %s.*
+
+*If you have any questions or concerns about this removal, please feel free to [message the moderators](https://www.reddit.com/message/compose/?to=/r/LeopardsAteMyFace) thru Modmail. Thanks!*`, rule, formattedModel)
 
 	return message, nil
 }

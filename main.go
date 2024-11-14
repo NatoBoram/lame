@@ -167,7 +167,7 @@ Body: %s
 	}
 
 	promptRemoval := reasonOrNone(removal)
-	fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s %s: ",
+	fmt.Printf("You can \"%s%s\", \"%s%s\" %s or %s%s %s: ",
 
 		aurora.Underline("a").Green(),
 		aurora.Green("pprove"),
@@ -176,7 +176,8 @@ Body: %s
 		aurora.Red("emove"),
 		aurora.Gray(12, promptRemoval),
 
-		aurora.Gray(12, "skip"),
+		aurora.Gray(12, "s").Underline(),
+		aurora.Gray(12, "kip"),
 		aurora.Gray(12, "(default)"),
 	)
 
@@ -223,7 +224,7 @@ Body: %s
 		if err != nil {
 			return fmt.Errorf("failed to remove post: %w", err)
 		}
-		fmt.Println("Removed!")
+		fmt.Println("Removed.")
 
 		if removal != nil {
 			removalMessage, err := formatRemovalMessage(removal.Reason, model)
@@ -243,6 +244,7 @@ Body: %s
 			if err != nil {
 				return fmt.Errorf("failed to distinguish and sticky removal reason: %w", err)
 			}
+			fmt.Println("Done.")
 		}
 
 	case "", "s", "skip":
@@ -275,7 +277,7 @@ func confirmNewRemovalReason() (bool, error) {
 	switch strings.TrimSpace(input) {
 	case "y", "yes":
 		return true, nil
-	case "n", "no":
+	case "n", "no", "":
 		return false, nil
 	default:
 		fmt.Println("Invalid input.")

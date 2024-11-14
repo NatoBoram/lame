@@ -27,7 +27,7 @@ func toolName(resp openai.ChatCompletionResponse) *string {
 
 	if len(resp.Choices[0].Message.ToolCalls) > 1 {
 		fmt.Println("More than one tool call.")
-		prettyPrint(resp)
+		prettyPrint(resp.Choices[0].Message.ToolCalls)
 	}
 
 	return &resp.Choices[0].Message.ToolCalls[0].Function.Name

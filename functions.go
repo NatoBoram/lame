@@ -25,11 +25,11 @@ Only approve the post if filling this template would result in a coherent and pl
 			},
 			"something": {
 				Type:        jsonschema.String,
-				Description: "The thing that the person voted for, supported or wanted to impose on other people.",
+				Description: "The thing that the person voted for, supported or wanted to impose on other people. Max 80 characters.",
 			},
 			"consequences": {
 				Type:        jsonschema.String,
-				Description: "The consequences of the thing that the person voted for, supported or wanted to impose on other people and that they're suffering from. If the consequences haven't happened yet, remove the post.",
+				Description: "The consequences of the thing that the person voted for, supported or wanted to impose on other people and that they're suffering from. If the consequences haven't happened yet, remove the post. Max 80 characters.",
 			},
 		},
 		Required: []string{"someone", "something", "consequences"},

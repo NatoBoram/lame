@@ -193,10 +193,7 @@ Body: %s
 			return fmt.Errorf("failed to approve post: %w", err)
 		}
 
-		_, err = fmt.Println("Approved!")
-		if err != nil {
-			return fmt.Errorf("failed to print approval message: %w", err)
-		}
+		fmt.Println("Approved!")
 
 	case "r", "remove":
 		if removal == nil {
@@ -214,7 +211,8 @@ Body: %s
 					return fmt.Errorf("failed to confirm new removal reason: %w", err)
 				}
 				if !ok {
-					fmt.Println("Skipping...")
+					fmt.Println("Skipped.")
+					fmt.Println()
 					return nil
 				}
 			}
@@ -248,23 +246,14 @@ Body: %s
 		}
 
 	case "", "s", "skip":
-		_, err = fmt.Println("Skipping...")
-		if err != nil {
-			return fmt.Errorf("failed to print skip message: %w", err)
-		}
+		fmt.Println("Skipping...")
 
 	default:
-		_, err = fmt.Println("Invalid input. Skipping...")
-		if err != nil {
-			return fmt.Errorf("failed to print invalid input message: %w", err)
-		}
+		fmt.Println("Invalid input. Skipping...")
+
 	}
 
-	_, err = fmt.Println()
-	if err != nil {
-		return fmt.Errorf("failed to print newline: %w", err)
-	}
-
+	fmt.Println()
 	return err
 }
 
@@ -308,10 +297,6 @@ func prettyPrint(i interface{}) error {
 		return fmt.Errorf("failed to marshal JSON: %w", err)
 	}
 
-	_, err = fmt.Println(string(s))
-	if err != nil {
-		return fmt.Errorf("failed to print JSON: %w", err)
-	}
-
+	fmt.Println(string(s))
 	return err
 }

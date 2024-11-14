@@ -7,7 +7,7 @@ import (
 
 var approve = openai.FunctionDefinition{
 	Name: "approve",
-	Description: `Approve a post when the explanatory comment properly explains how someone is suffering consequences from something they voted for, supported or wanted to impose on other people.
+	Description: `Approve a post when the explanatory comment properly explains how someone is suffering consequences from something they voted for, supported or wanted to impose on other people and it does not correspond to any removal reasons.
 
 The parameters of this function are goins to fill in the following template:
 
@@ -46,9 +46,21 @@ var remove = openai.FunctionDefinition{
 				Type: jsonschema.String,
 				Description: `These are the removal reasons of the subreddit. If the post fits one of these, remove it.
 
-* The words "leopard", "ate", "face" and all their derivatives are forbidden in the title and in the explanatory comment.
-* This is not a subreddit of the future. The consequences must have already happened.
-* The enabler and the victim must be the same person.`,
+bad_explanatory_comment: It is impossible to identify who supported something or what they supported or what are the consequences from the explanatory comment
+direct_link_to_other_subreddit: Contains a reference to another subreddit
+distinct_enabler_and_victim: The person who supported something is not the same person as the one who receives the consequences
+does_not_fit_the_subreddit: The post is not about someone who's suffering consequences from something they voted for or supported or wanted to impose on other people.
+future_consequences: The consequences have not happened yet or are likely to happen
+leopard_in_title_or_explanatory_comment: The words "leopards", "ate" and "face" are forbidden in the title, body and explanatory comment
+no_explanatory_comment: The explanatory comment is empty
+uncivil_behaviour: The user is uncivil
+
+bye_bye_job: Someone did something and lost their job as a consequence, but losing their job isn't *necessarily* a consequence of what they did
+hypocrisy: Someone is being a hypocrite but they're not feeling any consequences of what they supported
+lesser_of_two_evils: Someone voted for something terrible, but that's only because the other choice was something even worse
+self_aware_wolf: Someone accidentally describes themselves but they're not self-aware enough to realize it
+stupidity: Someone is being stupid, but there's no schadenfreude to be had
+sudden_betrayal: Someone was unpredictably betrayed by that they supported`,
 				Enum: []string{
 					// Removal reasons
 					string(ACTUAL_ANIMAL_ATTACK),

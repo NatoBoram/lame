@@ -43,7 +43,6 @@ const (
 
 var trappedFlairs = []RemovalReason{
 	BYE_BYE_JOB,
-	FUTURE_CONSEQUENCES,
 	HYPOCRISY,
 	LESSER_OF_TWO_EVILS,
 	SELF_AWARE_WOLF,

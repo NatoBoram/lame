@@ -41,3 +41,7 @@ To use Ollama, host it somewhere and fill the fields in `~/.config/lame/openai_c
 Once the information is filled out, run `lame` again and it'll prompt for Reddit post links.
 
 Only links in the form of `https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq` are supported.
+
+## Example
+
+![image](https://github.com/user-attachments/assets/ecd6b2e8-2cc5-44a1-b867-8d1c38dba3c8)

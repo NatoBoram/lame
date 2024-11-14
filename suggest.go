@@ -20,6 +20,16 @@ func suggest(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
 		return nil, nil, nil
 	}
 
+	if len(resp.Choices) > 1 {
+		fmt.Println("More than one choice.")
+		prettyPrint(resp)
+	}
+
+	if len(resp.Choices[0].Message.ToolCalls) > 1 {
+		fmt.Println("More than one tool call.")
+		prettyPrint(resp)
+	}
+
 	function := resp.Choices[0].Message.ToolCalls[0].Function
 	switch function.Name {
 

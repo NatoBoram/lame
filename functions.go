@@ -51,6 +51,7 @@ var remove = openai.FunctionDefinition{
 * "No explanatory comment" means there's literally nothing in the explanatory comment. Do not approve posts without an explanatory comment.
 * "No consequences yet" is for when the stated consequences didn't actually happen yet.`,
 				Enum: []string{
+					// Removal reasons
 					string(ACTUAL_ANIMAL_ATTACK),
 					string(BAD_EXPLANATORY_COMMENT),
 					string(DIRECT_LINK_TO_OTHER_SUBREDDIT),
@@ -59,9 +60,18 @@ var remove = openai.FunctionDefinition{
 					string(NO_CONSEQUENCES_YET),
 					string(NO_EXPLANATORY_COMMENT),
 					string(UNCIVIL_BEHAVIOUR),
+
+					// Trapped flairs
+					string(BYE_BYE_JOB),
+					string(HYPOCRISY),
+					string(LESSER_OF_TWO_EVILS),
+					string(SELF_AWARE_WOLF),
+					string(STUPIDITY),
+					string(SUDDEN_BETRAYAL),
 				},
 			},
 		},
+		Required: []string{"reason"},
 	},
 }
 

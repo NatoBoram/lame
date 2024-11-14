@@ -52,6 +52,7 @@ distinct_enabler_and_victim: The person who supported something is not the same 
 does_not_fit_the_subreddit: The post is not about someone who's suffering consequences from something they voted for or supported or wanted to impose on other people.
 future_consequences: The consequences have not happened yet or are likely to happen
 leopard_in_title_or_explanatory_comment: The words "leopards", "ate" and "face" are forbidden in the title, body and explanatory comment
+no_consequences: There are no consequences in the post or explanatory comment
 no_explanatory_comment: The explanatory comment is empty
 uncivil_behaviour: The user is uncivil
 
@@ -70,6 +71,7 @@ sudden_betrayal: Someone was unpredictably betrayed by that they supported`,
 					string(DOES_NOT_FIT_THE_SUBREDDIT),
 					string(FUTURE_CONSEQUENCES),
 					string(LEOPARD_IN_TITLE_OR_EXPLANATORY_COMMENT),
+					string(NO_CONSEQUENCES),
 					string(NO_EXPLANATORY_COMMENT),
 					string(UNCIVIL_BEHAVIOUR),
 

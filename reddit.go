@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -55,4 +56,62 @@ func FindExplanatoryComment(post *reddit.PostAndComments, automodComment *reddit
 // PermaLink converts a Reddit "permalink" to a full URL.
 func PermaLink(permalink string) string {
 	return "https://reddit.com" + permalink
+}
+
+func toRedditFeed(feed string) RedditFeed {
+	switch feed {
+	case "hot", "h":
+		return Hot
+	case "new", "n":
+		return New
+	case "top", "t":
+		return Top
+	case "rising", "r":
+		return Rising
+	default:
+		return ""
+	}
+}
+
+const (
+	Hot    RedditFeed = "hot"
+	New    RedditFeed = "new"
+	Top    RedditFeed = "top"
+	Rising RedditFeed = "rising"
+)
+
+type RedditFeed string
+
+func getFeedPosts(
+	ctx context.Context,
+	redditClient *reddit.Client,
+
+	feed RedditFeed,
+	opts *reddit.ListOptions,
+) ([]*reddit.Post, *reddit.Response, error) {
+
+	switch feed {
+	case Hot:
+		return redditClient.Subreddit.HotPosts(ctx, "LeopardsAteMyFace", opts)
+	case New:
+		return redditClient.Subreddit.NewPosts(ctx, "LeopardsAteMyFace", opts)
+	case Top:
+		return redditClient.Subreddit.TopPosts(ctx, "LeopardsAteMyFace",
+			&reddit.ListPostOptions{ListOptions: *opts},
+		)
+	case Rising:
+		return redditClient.Subreddit.RisingPosts(ctx, "LeopardsAteMyFace", opts)
+	default:
+		return nil, nil, fmt.Errorf("unknown feed: %s", feed)
+	}
+}
+
+func maybeOptions(after string) *reddit.ListOptions {
+	if after == "" {
+		return nil
+	}
+
+	return &reddit.ListOptions{
+		After: after,
+	}
 }

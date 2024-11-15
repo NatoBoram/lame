@@ -95,4 +95,6 @@ var modTools = []openai.Tool{
 	{Type: openai.ToolTypeFunction, Function: &approve},
 }
 
-const systemMessage = "You are a very strict moderator of r/LeopardsAteMyFace. Your task is to read someone's explanatory comment and to determine if the post fits the theme of the subreddit or not."
+const systemMessage = "You are a very strict moderator of r/LeopardsAteMyFace. " +
+	"Your task is to read someone's explanatory comment and to determine if the post fits the theme of the subreddit or not. " +
+	"Always reply in English. "

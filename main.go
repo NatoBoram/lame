@@ -72,35 +72,106 @@ func main() {
 	}
 
 	for {
-		err := mainLoop(ctx, redditClient, openaiClient, openaiCreds.Model, guide)
+		err := handleEntrypoint(ctx, redditClient, guide, openaiClient, openaiCreds.Model)
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
-
 }
 
-func mainLoop(ctx context.Context,
-	redditClient *reddit.Client,
+func handleEntrypoint(ctx context.Context,
+	redditClient *reddit.Client, guide *reddit.PostAndComments,
 	openaiClient *openai.Client, model string,
-	guide *reddit.PostAndComments,
 ) error {
-	_, err := fmt.Print("Enter a Reddit post url: ")
-	if err != nil {
-		return fmt.Errorf("failed to print prompt: %w", err)
-	}
+	fmt.Printf("Enter a Reddit post url or the name of a feed (%s%s, %s%s, %s%s, %s%s): ",
+		aurora.Gray(12, "h").Underline(),
+		aurora.Gray(12, "ot"),
+
+		aurora.Gray(12, "n").Underline(),
+		aurora.Gray(12, "ew"),
+
+		aurora.Gray(12, "t").Underline(),
+		aurora.Gray(12, "op"),
+
+		aurora.Gray(12, "r").Underline(),
+		aurora.Gray(12, "ising"),
+	)
 
 	reader := bufio.NewReader(os.Stdin)
-	url, err := reader.ReadString('\n')
+	input, err := reader.ReadString('\n')
 	if err != nil {
-		return fmt.Errorf("failed to read input: %w", err)
+		return fmt.Errorf("failed to read post url or feed name: %w", err)
 	}
 
-	postId, err := GetPostId(url)
-	if err != nil {
-		return fmt.Errorf("failed to get post id: %w", err)
+	feed := toRedditFeed(strings.TrimSpace(input))
+	if feed == "" {
+		err := handlePost(ctx, redditClient, guide, openaiClient, model, input)
+		if err != nil {
+			return fmt.Errorf("failed to handle post url: %w", err)
+		}
+	} else {
+		err := handleFeed(ctx, redditClient, guide, openaiClient, model, feed)
+		if err != nil {
+			return fmt.Errorf("failed to handle feed: %w", err)
+		}
 	}
 
+	return err
+}
+
+func handleFeed(ctx context.Context,
+	redditClient *reddit.Client, guide *reddit.PostAndComments,
+	openaiClient *openai.Client, model string,
+
+	feed RedditFeed,
+) error {
+	var after string
+
+	for {
+		opts := maybeOptions(after)
+		posts, _, err := getFeedPosts(ctx, redditClient, feed, opts)
+		if err != nil {
+			return fmt.Errorf("failed to get feed posts: %w", err)
+		}
+
+		err = handlePage(ctx, redditClient, guide, openaiClient, model, posts)
+		if err != nil {
+			return fmt.Errorf("failed to handle feed page: %w", err)
+		}
+
+		after = posts[len(posts)-1].FullID
+	}
+}
+
+func handlePage(
+	ctx context.Context,
+	redditClient *reddit.Client, guide *reddit.PostAndComments,
+	openaiClient *openai.Client, model string,
+
+	posts []*reddit.Post,
+) error {
+	for _, post := range posts {
+		// TODO: Check for `approved`. go-reddit is missing this field and it's
+		// abandoned so I can't even submit a pull request.
+		if post.Stickied || post.Locked {
+			continue
+		}
+
+		err := handlePost(ctx, redditClient, guide, openaiClient, model, post.ID)
+		if err != nil {
+			return fmt.Errorf("failed to handle post: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func handlePost(ctx context.Context,
+	redditClient *reddit.Client, guide *reddit.PostAndComments,
+	openaiClient *openai.Client, model string,
+
+	postId string,
+) error {
 	post, _, err := redditClient.Post.Get(ctx, postId)
 	if err != nil {
 		return fmt.Errorf("failed to get post: %w", err)
@@ -181,6 +252,7 @@ Body: %s
 		aurora.Gray(12, "(default)"),
 	)
 
+	reader := bufio.NewReader(os.Stdin)
 	input, err := reader.ReadString('\n')
 	if err != nil {
 		return fmt.Errorf("failed to read input: %w", err)
@@ -248,14 +320,13 @@ Body: %s
 		}
 
 	case "", "s", "skip":
-		fmt.Println("Skipping...")
+		fmt.Println("Skipped.")
 
 	default:
-		fmt.Println("Invalid input. Skipping...")
+		fmt.Println("Invalid input. Skipped.")
 
 	}
 
-	fmt.Println()
 	return err
 }
 

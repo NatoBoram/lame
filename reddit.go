@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/logrusorgru/aurora/v4"
 	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
@@ -89,7 +90,6 @@ func getFeedPosts(
 	feed RedditFeed,
 	opts *reddit.ListOptions,
 ) ([]*reddit.Post, *reddit.Response, error) {
-
 	switch feed {
 	case Hot:
 		return redditClient.Subreddit.HotPosts(ctx, "LeopardsAteMyFace", opts)
@@ -114,4 +114,8 @@ func maybeOptions(after string) *reddit.ListOptions {
 	return &reddit.ListOptions{
 		After: after,
 	}
+}
+
+func formatAutomoderator(comment *reddit.Comment) aurora.Value {
+	return aurora.Green("u/" + comment.Author).Hyperlink("https://reddit.com/u/" + comment.Author)
 }

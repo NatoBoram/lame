@@ -12,9 +12,11 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/logrusorgru/aurora/v4"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/theckman/yacspin"
 	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
@@ -22,6 +24,21 @@ const version = "0.0.0"
 const packageName = "github.com/NatoBoram/lame"
 
 func main() {
+	spinner, err := yacspin.New(yacspin.Config{
+		CharSet:           yacspin.CharSets[11],
+		Frequency:         100 * time.Millisecond,
+		Message:           "",
+		StopCharacter:     "✓",
+		StopColors:        []string{"fgGreen"},
+		StopFailCharacter: "✗",
+		StopFailColors:    []string{"fgRed"},
+		StopMessage:       "Done.",
+		Suffix:            " ",
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	dir, err := lameConfigDir()
 	if err != nil {
 		panic(err)
@@ -48,14 +65,19 @@ func main() {
 	}
 
 	ctx := context.Background()
+
+	spinner.Message("Logging in to Reddit...")
+	spinner.Start()
 	user, _, err := redditClient.Account.Info(ctx)
 	if err != nil {
+		spinner.StopFailMessage("Failed to log in to Reddit.")
+		spinner.StopFail()
 		panic(err)
 	}
-
-	fmt.Printf("Logged in as %s\n",
+	spinner.StopMessage(fmt.Sprintf("Logged in as %s",
 		aurora.Red("u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name),
-	)
+	))
+	spinner.Stop()
 
 	openaiCreds, err := readOpenAiCredentials(dir)
 	if err != nil {
@@ -66,15 +88,27 @@ func main() {
 	openaiClient := openai.NewClientWithConfig(config)
 
 	// A guide to this sub's explanatory comment rule.
+	spinner.Message("Getting the guide to this sub's explanatory comment rule...")
+	spinner.Start()
 	guide, _, err := redditClient.Post.Get(ctx, redCreds.Guide)
 	if err != nil {
+		spinner.StopFailMessage("Failed to get the explanatory comment guide.")
+		spinner.StopFail()
 		panic(err)
 	}
+	spinner.StopMessage("Got the explanatory comment guide.")
+	spinner.Stop()
+	fmt.Println()
 
 	for {
-		err := handleEntrypoint(ctx, redditClient, guide, openaiClient, openaiCreds.Model)
+		err := handleEntrypoint(ctx, redditClient, guide, openaiClient, openaiCreds.Model, spinner)
 		if err != nil {
-			fmt.Println(err)
+			spinner.StopFailMessage(err.Error())
+			if spinner.Status() == yacspin.SpinnerStopped {
+				fmt.Println(err)
+			} else {
+				spinner.StopFail()
+			}
 		}
 	}
 }
@@ -82,6 +116,7 @@ func main() {
 func handleEntrypoint(ctx context.Context,
 	redditClient *reddit.Client, guide *reddit.PostAndComments,
 	openaiClient *openai.Client, model string,
+	spinner *yacspin.Spinner,
 ) error {
 	fmt.Printf("Enter a Reddit post url or the name of a feed (%s%s, %s%s, %s%s, %s%s): ",
 		aurora.Gray(12, "h").Underline(),
@@ -105,12 +140,12 @@ func handleEntrypoint(ctx context.Context,
 
 	feed := toRedditFeed(strings.TrimSpace(input))
 	if feed == "" {
-		err := handlePost(ctx, redditClient, guide, openaiClient, model, input)
+		err := handlePost(ctx, redditClient, guide, openaiClient, model, input, spinner)
 		if err != nil {
 			return fmt.Errorf("failed to handle post url: %w", err)
 		}
 	} else {
-		err := handleFeed(ctx, redditClient, guide, openaiClient, model, feed)
+		err := handleFeed(ctx, redditClient, guide, openaiClient, model, feed, spinner)
 		if err != nil {
 			return fmt.Errorf("failed to handle feed: %w", err)
 		}
@@ -124,17 +159,23 @@ func handleFeed(ctx context.Context,
 	openaiClient *openai.Client, model string,
 
 	feed RedditFeed,
+	spinner *yacspin.Spinner,
 ) error {
 	var after string
 
 	for {
+		spinner.Message(fmt.Sprintf("Getting %s feed...", feed))
+		spinner.Start()
+
 		opts := maybeOptions(after)
 		posts, _, err := getFeedPosts(ctx, redditClient, feed, opts)
 		if err != nil {
 			return fmt.Errorf("failed to get feed posts: %w", err)
 		}
+		spinner.StopMessage(fmt.Sprintf("Got %s feed.", feed))
+		spinner.Stop()
 
-		err = handlePage(ctx, redditClient, guide, openaiClient, model, posts)
+		err = handlePage(ctx, redditClient, guide, openaiClient, model, posts, spinner)
 		if err != nil {
 			return fmt.Errorf("failed to handle feed page: %w", err)
 		}
@@ -149,6 +190,7 @@ func handlePage(
 	openaiClient *openai.Client, model string,
 
 	posts []*reddit.Post,
+	spinner *yacspin.Spinner,
 ) error {
 	for _, post := range posts {
 		// TODO: Check for `approved`. go-reddit is missing this field and it's
@@ -157,7 +199,7 @@ func handlePage(
 			continue
 		}
 
-		err := handlePost(ctx, redditClient, guide, openaiClient, model, post.ID)
+		err := handlePost(ctx, redditClient, guide, openaiClient, model, post.ID, spinner)
 		if err != nil {
 			return fmt.Errorf("failed to handle post: %w", err)
 		}
@@ -171,11 +213,16 @@ func handlePost(ctx context.Context,
 	openaiClient *openai.Client, model string,
 
 	postId string,
+	spinner *yacspin.Spinner,
 ) error {
+	spinner.Message(fmt.Sprintf("Getting post %s...", postId))
+	spinner.Start()
 	post, _, err := redditClient.Post.Get(ctx, postId)
 	if err != nil {
 		return fmt.Errorf("failed to get post: %w", err)
 	}
+	spinner.StopMessage(fmt.Sprintf("Got post %s.", postId))
+	spinner.Stop()
 
 	fmt.Printf(`
 Title: %s
@@ -195,13 +242,17 @@ URL: %s
 
 	fmt.Printf("Found %s by %s\n",
 		aurora.Hyperlink("comment", PermaLink(automodComment.Permalink)),
-		aurora.Green("u/"+automodComment.Author).Hyperlink("https://reddit.com/u/"+automodComment.Author),
+		formatAutomoderator(automodComment),
 	)
 
+	spinner.Message(fmt.Sprintf("Loading replies to %s...", formatAutomoderator(automodComment)))
+	spinner.Start()
 	_, err = redditClient.Comment.LoadMoreReplies(ctx, automodComment)
 	if err != nil {
 		return fmt.Errorf("failed to load more replies: %w", err)
 	}
+	spinner.StopMessage(fmt.Sprintf("Loaded replies to %s.", formatAutomoderator(automodComment)))
+	spinner.Stop()
 
 	opReply, err := FindExplanatoryComment(post, automodComment)
 	if err != nil {
@@ -219,6 +270,8 @@ Body: %s
 		)
 	}
 
+	spinner.Message("Requesting a suggestion...")
+	spinner.Start()
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model: model,
 		Messages: []openai.ChatCompletionMessage{
@@ -231,6 +284,9 @@ Body: %s
 	if err != nil {
 		return fmt.Errorf("failed to create chat completion: %w", err)
 	}
+	spinner.StopMessage("Got a suggestion.")
+	spinner.Stop()
+	fmt.Println()
 
 	_, removal, err := suggest(resp)
 	if err != nil {
@@ -260,24 +316,30 @@ Body: %s
 
 	switch strings.TrimSpace(input) {
 	case "a", "approve":
-		fmt.Println("Approving...")
+		spinner.Message("Approving...")
+		spinner.Start()
 		_, err := redditClient.Moderation.Approve(ctx, post.Post.FullID)
 		if err != nil {
 			return fmt.Errorf("failed to approve post: %w", err)
 		}
-
-		fmt.Println("Approved!")
+		spinner.StopMessage("Approved.")
+		spinner.Stop()
 
 	case "r", "remove":
 		if removal == nil {
-			fmt.Println("Getting new removal reason...")
+			spinner.Message("Getting new removal reason...")
+			spinner.Start()
 			removal, err = retryRemovalReason(post, automodComment, opReply, ctx, model, openaiClient)
 			if err != nil {
-				fmt.Printf("Failed to get another removal reason: %v\n", err)
+				spinner.StopFailMessage(
+					fmt.Sprintf("Failed to get another removal reason: %v\n", err),
+				)
+				spinner.StopFail()
 			}
 
 			if removal != nil {
-				fmt.Printf("Got new removal reason: %s\n", removal.Reason)
+				spinner.StopMessage(fmt.Sprintf("Got new removal reason: %s\n", removal.Reason))
+				spinner.Stop()
 
 				ok, err := confirmNewRemovalReason()
 				if err != nil {
@@ -289,14 +351,19 @@ Body: %s
 					return nil
 				}
 			}
+
+			spinner.StopFailMessage("Did not get a new removal reason")
+			spinner.StopFail()
 		}
 
-		fmt.Println("Removing...")
+		spinner.Message("Removing...")
+		spinner.Start()
 		_, err := redditClient.Moderation.Remove(ctx, post.Post.FullID)
 		if err != nil {
 			return fmt.Errorf("failed to remove post: %w", err)
 		}
-		fmt.Println("Removed.")
+		spinner.StopMessage("Removed.")
+		spinner.Stop()
 
 		if removal != nil {
 			removalMessage, err := formatRemovalMessage(removal.Reason, model)
@@ -304,19 +371,22 @@ Body: %s
 				return fmt.Errorf("failed to format removal message: %w", err)
 			}
 
-			fmt.Println("Adding removal reason...")
+			spinner.Message("Adding removal reason...")
+			spinner.Start()
 			removalComment, _, err := redditClient.Comment.Submit(ctx, post.Post.FullID, removalMessage)
 			if err != nil {
 				return fmt.Errorf("failed to submit removal reason: %w", err)
 			}
-			fmt.Printf("Removal reason added: %s\n", PermaLink(removalComment.Permalink))
+			spinner.StopMessage(fmt.Sprintf("Removal reason added: %s\n", PermaLink(removalComment.Permalink)))
+			spinner.Stop()
 
-			fmt.Println("Distinguishing and stickying removal reason...")
+			spinner.Message("Distinguishing and stickying removal reason...")
+			spinner.Start()
 			_, err = redditClient.Moderation.DistinguishAndSticky(ctx, removalComment.FullID)
 			if err != nil {
 				return fmt.Errorf("failed to distinguish and sticky removal reason: %w", err)
 			}
-			fmt.Println("Done.")
+			spinner.StopMessage("Distinguished and stickied removal reason.")
 		}
 
 	case "", "s", "skip":
@@ -327,6 +397,7 @@ Body: %s
 
 	}
 
+	fmt.Println()
 	return err
 }
 

@@ -71,3 +71,27 @@ func TestFindExplanatoryComment(t *testing.T) {
 		t.Errorf("FindExplanatoryComment() = %v; expected %v", actual, expected)
 	}
 }
+
+func TestToRedditFeed(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected RedditFeed
+	}{
+		{"hot", Hot},
+		{"h", Hot},
+		{"new", New},
+		{"n", New},
+		{"rising", Rising},
+		{"r", Rising},
+		{"top", Top},
+		{"t", Top},
+		{"unknown", ""},
+	}
+
+	for _, test := range tests {
+		result := ToRedditFeed(test.input)
+		if result != test.expected {
+			t.Errorf("toRedditFeed(%s) = %s; expected %s", test.input, result, test.expected)
+		}
+	}
+}

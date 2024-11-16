@@ -140,7 +140,7 @@ func handleEntrypoint(ctx context.Context,
 		return fmt.Errorf("failed to read post url or feed name: %w", err)
 	}
 
-	feed := toRedditFeed(strings.TrimSpace(input))
+	feed := ToRedditFeed(strings.TrimSpace(input))
 	if feed == "" {
 		err := handlePost(ctx, redditClient, guide, openaiClient, model, input, spinner)
 		if err != nil {

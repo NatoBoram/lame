@@ -58,7 +58,7 @@ func PermaLink(permalink string) string {
 	return "https://reddit.com" + permalink
 }
 
-func toRedditFeed(feed string) RedditFeed {
+func ToRedditFeed(feed string) RedditFeed {
 	switch feed {
 	case "hot", "h":
 		return Hot

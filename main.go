@@ -281,7 +281,7 @@ Body: %s
 			{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Body},
 			{Role: openai.ChatMessageRoleUser, Content: MakeUserContext(post, opReply)},
 		},
-		Tools: modTools,
+		Tools: flairTools,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create chat completion: %w", err)
@@ -290,7 +290,7 @@ Body: %s
 	spinner.Stop()
 	fmt.Println()
 
-	_, removal, err := suggest(resp)
+	_, removal, err := suggestFlair(resp)
 	if err != nil {
 		return fmt.Errorf("failed to suggest approval or removal: %w", err)
 	}

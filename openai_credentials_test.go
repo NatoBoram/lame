@@ -28,12 +28,12 @@ func TestMarshalOpenAiCredentials(t *testing.T) {
 		Model:   "gpt-3.5-turbo",
 	}
 
+	expected := `{"Token":"70652f4a-61d2-4d78-bd3b-d4ee1c0ff296","BaseURL":"https://api.openai.com/v1","Model":"gpt-3.5-turbo"}`
 	result, err := creds.Marshal()
 	if err != nil {
 		t.Fatalf("couldn't marshal OpenAI credentials: %v", err)
 	}
 
-	expected := `{"Token":"70652f4a-61d2-4d78-bd3b-d4ee1c0ff296","BaseURL":"https://api.openai.com/v1","Model":"gpt-3.5-turbo"}`
 	if string(result) != expected {
 		t.Errorf("expected %s, got %s", expected, string(result))
 	}

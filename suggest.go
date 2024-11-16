@@ -100,7 +100,6 @@ Consequences: %s
 		aurora.Gray(6, approval.Consequences),
 		explanation,
 	)
-
 }
 
 func suggestRemove(removal Removal) {
@@ -108,5 +107,4 @@ func suggestRemove(removal Removal) {
 Reason: %s
 
 `, aurora.Red("Remove"), removal.Reason)
-
 }

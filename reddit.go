@@ -16,7 +16,6 @@ const AutoModeratorID = "t2_6l4z3"
 //
 // https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq/a_guide_to_this_subs_explanatory_comment_rule
 func GetPostId(url string) (string, error) {
-
 	segments := strings.Split(url, "/")
 	index := 0
 	for i, segment := range segments {

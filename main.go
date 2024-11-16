@@ -20,8 +20,10 @@ import (
 	"github.com/theckman/yacspin"
 )
 
-const version = "0.0.0"
-const packageName = "github.com/NatoBoram/lame"
+const (
+	version     = "0.0.0"
+	packageName = "github.com/NatoBoram/lame"
+)
 
 func main() {
 	spinner, err := yacspin.New(yacspin.Config{

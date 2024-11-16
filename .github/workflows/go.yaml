@@ -21,4 +21,5 @@ jobs:
           go-version: stable
 
       - run: go build -v
+      - run: go vet -v
       - run: go test -v

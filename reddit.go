@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Sadzeih/go-reddit/reddit"
 	"github.com/logrusorgru/aurora/v4"
-	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
 // AutoModeratorID is the user ID of u/AutoModerator.

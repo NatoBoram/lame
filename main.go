@@ -14,10 +14,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Sadzeih/go-reddit/reddit"
 	"github.com/logrusorgru/aurora/v4"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/theckman/yacspin"
-	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
 const version = "0.0.0"

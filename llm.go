@@ -5,8 +5,8 @@ import (
 	"encoding/xml"
 	"fmt"
 
+	"github.com/Sadzeih/go-reddit/reddit"
 	openai "github.com/sashabaranov/go-openai"
-	"github.com/vartanbeno/go-reddit/v2/reddit"
 )
 
 type UserContext struct {

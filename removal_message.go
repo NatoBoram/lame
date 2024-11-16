@@ -15,7 +15,7 @@ var reasonToRule = map[RemovalReason]string{
 	NO_CONSEQUENCES:                         "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThere are no consequences in your post.",
 }
 
-func flairToRemovalReason(removalReason RemovalReason) RemovalReason {
+func FlairToRemovalReason(removalReason RemovalReason) RemovalReason {
 	for _, flair := range trappedFlairs {
 		if removalReason == flair {
 			return DOES_NOT_FIT_THE_SUBREDDIT
@@ -26,7 +26,7 @@ func flairToRemovalReason(removalReason RemovalReason) RemovalReason {
 }
 
 func formatRemovalMessage(removalReason RemovalReason, model string) (string, error) {
-	reason := flairToRemovalReason(removalReason)
+	reason := FlairToRemovalReason(removalReason)
 	rule, ok := reasonToRule[reason]
 	if !ok {
 		return "", fmt.Errorf("no rule found for reason: %s", reason)

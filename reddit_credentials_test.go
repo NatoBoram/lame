@@ -22,3 +22,23 @@ func TestUnmarshalRedditCredentials(t *testing.T) {
 		t.Errorf("expected %v, got %v", expected, result)
 	}
 }
+
+func TestMarshalRedditCredentials(t *testing.T) {
+	creds := RedditCredentials{
+		ID:       "test-id",
+		Secret:   "test-secret",
+		Username: "test-username",
+		Password: "test-password",
+		Guide:    "test-guide",
+	}
+
+	result, err := creds.Marshal()
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	expected := `{"ID":"test-id","Secret":"test-secret","Username":"test-username","Password":"test-password","Guide":"test-guide"}`
+	if string(result) != expected {
+		t.Errorf("expected %s, got %s", expected, string(result))
+	}
+}

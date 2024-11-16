@@ -279,7 +279,7 @@ Body: %s
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
 			{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Body},
-			{Role: openai.ChatMessageRoleUser, Content: makeUserContext(post, opReply)},
+			{Role: openai.ChatMessageRoleUser, Content: MakeUserContext(post, opReply)},
 		},
 		Tools: modTools,
 	})

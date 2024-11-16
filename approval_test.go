@@ -14,15 +14,15 @@ func TestUnmarshalApproval(t *testing.T) {
 	}
 
 	if approval.Someone != "foo" {
-		t.Fatalf("expected someone to be %s, got %s", "foo", approval.Someone)
+		t.Errorf("expected someone to be %s, got %s", "foo", approval.Someone)
 	}
 
 	if approval.Something != "bar" {
-		t.Fatalf("expected something to be %s, got %s", "bar", approval.Something)
+		t.Errorf("expected something to be %s, got %s", "bar", approval.Something)
 	}
 
 	if approval.Consequences != "baz" {
-		t.Fatalf("expected consequences to be %s, got %s", "baz", approval.Consequences)
+		t.Errorf("expected consequences to be %s, got %s", "baz", approval.Consequences)
 	}
 }
 
@@ -39,6 +39,6 @@ func TestMarshalApproval(t *testing.T) {
 
 	expected := []byte(`{"someone":"foo","something":"bar","consequences":"baz"}`)
 	if string(data) != string(expected) {
-		t.Fatalf("expected %s, got %s", expected, data)
+		t.Errorf("expected %s, got %s", expected, data)
 	}
 }

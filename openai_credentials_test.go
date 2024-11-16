@@ -48,3 +48,27 @@ func TestOpenAiCredentialsPath(t *testing.T) {
 		t.Errorf("expected %s, got %s", expected, result)
 	}
 }
+
+func TestVerifyOpenAiCredentials(t *testing.T) {
+	validCreds := OpenAiCredentials{
+		Token:   "f8f920c4-4167-4d08-9d43-c686bad907c5",
+		BaseURL: "https://api.openai.com/v1",
+		Model:   "gpt-3.5-turbo",
+	}
+
+	if err := VerifyOpenAiCredentials(validCreds); err != nil {
+		t.Errorf("expected no error, got %v", err)
+	}
+
+	invalidCreds := []OpenAiCredentials{
+		{BaseURL: "https://api.openai.com/v1", Model: "gpt-3.5-turbo"},
+		{BaseURL: "https://api.openai.com/v1", Token: "valid-token"},
+		{Model: "gpt-3.5-turbo", Token: "valid-token"},
+	}
+
+	for _, creds := range invalidCreds {
+		if err := VerifyOpenAiCredentials(creds); err == nil {
+			t.Errorf("expected error, got nil for creds: %v", creds)
+		}
+	}
+}

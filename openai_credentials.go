@@ -56,7 +56,7 @@ func readOpenAiCredentials(configDir string) (OpenAiCredentials, error) {
 		return creds, fmt.Errorf("failed to unmarshal OpenAI credentials: %w", err)
 	}
 
-	err = verifyOpenAiCredentials(creds)
+	err = VerifyOpenAiCredentials(creds)
 	return creds, err
 }
 
@@ -64,7 +64,7 @@ func OpenAiCredentialsPath(configDir string) string {
 	return filepath.Join(configDir, "openai_credentials.json")
 }
 
-func verifyOpenAiCredentials(creds OpenAiCredentials) error {
+func VerifyOpenAiCredentials(creds OpenAiCredentials) error {
 	if creds.Token == "" {
 		return fmt.Errorf("OpenAI token is empty")
 	}

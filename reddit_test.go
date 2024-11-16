@@ -5,6 +5,7 @@ import (
 
 	. "github.com/NatoBoram/lame"
 	"github.com/Sadzeih/go-reddit/reddit"
+	"github.com/logrusorgru/aurora/v4"
 )
 
 func TestGetPostId(t *testing.T) {
@@ -108,5 +109,15 @@ func TestMaybeOptions_WithAfterToken(t *testing.T) {
 	expected := &reddit.ListOptions{After: "after-token"}
 	if result == nil || *result != *expected {
 		t.Errorf("MaybeOptions(\"after-token\") = %v; expected %v", result, expected)
+	}
+}
+
+func TestFormatAutomoderator(t *testing.T) {
+	comment := &reddit.Comment{Author: "AutoModerator"}
+	result := FormatAutomoderator(comment)
+
+	expected := aurora.Green("u/AutoModerator").Hyperlink("https://reddit.com/u/AutoModerator")
+	if result.Value() != expected.Value() {
+		t.Errorf("FormatAutomoderator(%v) = %v; expected %v", comment, result, expected)
 	}
 }

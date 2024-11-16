@@ -244,16 +244,16 @@ URL: %s
 
 	fmt.Printf("Found %s by %s\n",
 		aurora.Hyperlink("comment", PermaLink(automodComment.Permalink)),
-		formatAutomoderator(automodComment),
+		FormatAutomoderator(automodComment),
 	)
 
-	spinner.Message(fmt.Sprintf("Loading replies to %s...", formatAutomoderator(automodComment)))
+	spinner.Message(fmt.Sprintf("Loading replies to %s...", FormatAutomoderator(automodComment)))
 	spinner.Start()
 	_, err = redditClient.Comment.LoadMoreReplies(ctx, automodComment)
 	if err != nil {
 		return fmt.Errorf("failed to load more replies: %w", err)
 	}
-	spinner.StopMessage(fmt.Sprintf("Loaded replies to %s.", formatAutomoderator(automodComment)))
+	spinner.StopMessage(fmt.Sprintf("Loaded replies to %s.", FormatAutomoderator(automodComment)))
 	spinner.Stop()
 
 	opReply, err := FindExplanatoryComment(post, automodComment)

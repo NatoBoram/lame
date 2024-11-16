@@ -368,7 +368,7 @@ Body: %s
 		spinner.Stop()
 
 		if removal != nil {
-			removalMessage, err := formatRemovalMessage(removal.Reason, model)
+			removalMessage, err := FormatRemovalMessage(removal.Reason, model)
 			if err != nil {
 				return fmt.Errorf("failed to format removal message: %w", err)
 			}

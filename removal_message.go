@@ -25,7 +25,7 @@ func FlairToRemovalReason(removalReason RemovalReason) RemovalReason {
 	return removalReason
 }
 
-func formatRemovalMessage(removalReason RemovalReason, model string) (string, error) {
+func FormatRemovalMessage(removalReason RemovalReason, model string) (string, error) {
 	reason := FlairToRemovalReason(removalReason)
 	rule, ok := reasonToRule[reason]
 	if !ok {

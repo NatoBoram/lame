@@ -60,7 +60,7 @@ func readOpenAiCredentials(configDir string) (OpenAiCredentials, error) {
 	return creds, err
 }
 
-func openAiCredentialsPath(configDir string) string {
+func OpenAiCredentialsPath(configDir string) string {
 	return filepath.Join(configDir, "openai_credentials.json")
 }
 

@@ -63,7 +63,7 @@ func retryRemovalReason(
 		return nil, fmt.Errorf("failed to ask for another removal reason: %w", err)
 	}
 
-	_, removal, err := toolCall(resp)
+	_, removal, err := ToolCall(resp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get another removal reason: %w", err)
 	}

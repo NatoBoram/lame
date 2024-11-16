@@ -29,7 +29,7 @@ type RedditCredentials struct {
 }
 
 func readRedditCredentials(configDir string) (RedditCredentials, error) {
-	credsPath := redditCredentialsPath(configDir)
+	credsPath := RedditCredentialsPath(configDir)
 
 	file, err := os.Open(credsPath)
 	if err != nil {
@@ -56,7 +56,7 @@ func readRedditCredentials(configDir string) (RedditCredentials, error) {
 		return creds, fmt.Errorf("failed to unmarshal Reddit credentials: %w", err)
 	}
 
-	err = verifyRedditCredentials(creds)
+	err = VerifyRedditCredentials(creds)
 	return creds, err
 }
 
@@ -88,7 +88,7 @@ func createRedditCredentials(credsPath string) error {
 	return err
 }
 
-func verifyRedditCredentials(creds RedditCredentials) error {
+func VerifyRedditCredentials(creds RedditCredentials) error {
 	var list []string
 
 	if creds.ID == "" {
@@ -118,6 +118,6 @@ func verifyRedditCredentials(creds RedditCredentials) error {
 	return nil
 }
 
-func redditCredentialsPath(configDir string) string {
+func RedditCredentialsPath(configDir string) string {
 	return filepath.Join(configDir, "reddit_credentials.json")
 }

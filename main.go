@@ -140,7 +140,7 @@ func handleEntrypoint(ctx context.Context,
 		return fmt.Errorf("failed to read post url or feed name: %w", err)
 	}
 
-	feed := toRedditFeed(strings.TrimSpace(input))
+	feed := ToRedditFeed(strings.TrimSpace(input))
 	if feed == "" {
 		err := handlePost(ctx, redditClient, guide, openaiClient, model, input, spinner)
 		if err != nil {
@@ -169,7 +169,7 @@ func handleFeed(ctx context.Context,
 		spinner.Message(fmt.Sprintf("Getting %s feed...", feed))
 		spinner.Start()
 
-		opts := maybeOptions(after)
+		opts := MaybeOptions(after)
 		posts, _, err := getFeedPosts(ctx, redditClient, feed, opts)
 		if err != nil {
 			return fmt.Errorf("failed to get feed posts: %w", err)
@@ -244,16 +244,16 @@ URL: %s
 
 	fmt.Printf("Found %s by %s\n",
 		aurora.Hyperlink("comment", PermaLink(automodComment.Permalink)),
-		formatAutomoderator(automodComment),
+		FormatAutomoderator(automodComment),
 	)
 
-	spinner.Message(fmt.Sprintf("Loading replies to %s...", formatAutomoderator(automodComment)))
+	spinner.Message(fmt.Sprintf("Loading replies to %s...", FormatAutomoderator(automodComment)))
 	spinner.Start()
 	_, err = redditClient.Comment.LoadMoreReplies(ctx, automodComment)
 	if err != nil {
 		return fmt.Errorf("failed to load more replies: %w", err)
 	}
-	spinner.StopMessage(fmt.Sprintf("Loaded replies to %s.", formatAutomoderator(automodComment)))
+	spinner.StopMessage(fmt.Sprintf("Loaded replies to %s.", FormatAutomoderator(automodComment)))
 	spinner.Stop()
 
 	opReply, err := FindExplanatoryComment(post, automodComment)
@@ -279,7 +279,7 @@ Body: %s
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
 			{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Body},
-			{Role: openai.ChatMessageRoleUser, Content: makeUserContext(post, opReply)},
+			{Role: openai.ChatMessageRoleUser, Content: MakeUserContext(post, opReply)},
 		},
 		Tools: modTools,
 	})
@@ -368,7 +368,7 @@ Body: %s
 		spinner.Stop()
 
 		if removal != nil {
-			removalMessage, err := formatRemovalMessage(removal.Reason, model)
+			removalMessage, err := FormatRemovalMessage(removal.Reason, model)
 			if err != nil {
 				return fmt.Errorf("failed to format removal message: %w", err)
 			}

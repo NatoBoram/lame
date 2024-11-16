@@ -7,7 +7,8 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func toolName(resp openai.ChatCompletionResponse) *string {
+// Exported ToolName function
+func ToolName(resp openai.ChatCompletionResponse) *string {
 	if len(resp.Choices) == 0 {
 		fmt.Println("No suggestions.")
 		prettyPrint(resp)
@@ -33,8 +34,8 @@ func toolName(resp openai.ChatCompletionResponse) *string {
 	return &resp.Choices[0].Message.ToolCalls[0].Function.Name
 }
 
-func toolCall(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
-	name := toolName(resp)
+func ToolCall(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
+	name := ToolName(resp)
 	if name == nil {
 		return nil, nil, nil
 	}
@@ -61,7 +62,7 @@ func toolCall(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
 }
 
 func suggest(resp openai.ChatCompletionResponse) (*Approval, *Removal, error) {
-	approval, removal, error := toolCall(resp)
+	approval, removal, error := ToolCall(resp)
 	if error != nil {
 		return approval, removal, fmt.Errorf("failed to get tool call: %w", error)
 	}

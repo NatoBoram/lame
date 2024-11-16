@@ -58,7 +58,7 @@ func PermaLink(permalink string) string {
 	return "https://reddit.com" + permalink
 }
 
-func toRedditFeed(feed string) RedditFeed {
+func ToRedditFeed(feed string) RedditFeed {
 	switch feed {
 	case "hot", "h":
 		return Hot
@@ -105,7 +105,7 @@ func getFeedPosts(
 	}
 }
 
-func maybeOptions(after string) *reddit.ListOptions {
+func MaybeOptions(after string) *reddit.ListOptions {
 	if after == "" {
 		return nil
 	}
@@ -115,6 +115,6 @@ func maybeOptions(after string) *reddit.ListOptions {
 	}
 }
 
-func formatAutomoderator(comment *reddit.Comment) aurora.Value {
+func FormatAutomoderator(comment *reddit.Comment) aurora.Value {
 	return aurora.Green("u/" + comment.Author).Hyperlink("https://reddit.com/u/" + comment.Author)
 }

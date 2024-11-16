@@ -14,7 +14,7 @@ func TestUnmarshalRemoval(t *testing.T) {
 	}
 
 	if removal.Reason != "foo" {
-		t.Fatalf("expected reason to be 'foo', got %s", removal.Reason)
+		t.Errorf("expected reason to be 'foo', got %s", removal.Reason)
 	}
 }
 
@@ -27,6 +27,6 @@ func TestMarshalRemoval(t *testing.T) {
 
 	expected := []byte(`{"reason":"foo"}`)
 	if string(data) != string(expected) {
-		t.Fatalf("expected %s, got %s", expected, data)
+		t.Errorf("expected %s, got %s", expected, data)
 	}
 }

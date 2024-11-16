@@ -5,6 +5,7 @@ import (
 
 	. "github.com/NatoBoram/lame"
 	"github.com/Sadzeih/go-reddit/reddit"
+	"github.com/logrusorgru/aurora/v4"
 )
 
 func TestGetPostId(t *testing.T) {
@@ -69,5 +70,54 @@ func TestFindExplanatoryComment(t *testing.T) {
 
 	if actual != expected {
 		t.Errorf("FindExplanatoryComment() = %v; expected %v", actual, expected)
+	}
+}
+
+func TestToRedditFeed(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected RedditFeed
+	}{
+		{"hot", Hot},
+		{"h", Hot},
+		{"new", New},
+		{"n", New},
+		{"rising", Rising},
+		{"r", Rising},
+		{"top", Top},
+		{"t", Top},
+		{"unknown", ""},
+	}
+
+	for _, test := range tests {
+		result := ToRedditFeed(test.input)
+		if result != test.expected {
+			t.Errorf("toRedditFeed(%s) = %s; expected %s", test.input, result, test.expected)
+		}
+	}
+}
+
+func TestMaybeOptions_Empty(t *testing.T) {
+	result := MaybeOptions("")
+	if result != nil {
+		t.Errorf("MaybeOptions(\"\") = %v; expected nil", result)
+	}
+}
+
+func TestMaybeOptions_WithAfterToken(t *testing.T) {
+	result := MaybeOptions("after-token")
+	expected := &reddit.ListOptions{After: "after-token"}
+	if result == nil || *result != *expected {
+		t.Errorf("MaybeOptions(\"after-token\") = %v; expected %v", result, expected)
+	}
+}
+
+func TestFormatAutomoderator(t *testing.T) {
+	comment := &reddit.Comment{Author: "AutoModerator"}
+	result := FormatAutomoderator(comment)
+
+	expected := aurora.Green("u/AutoModerator").Hyperlink("https://reddit.com/u/AutoModerator")
+	if result.Value() != expected.Value() {
+		t.Errorf("FormatAutomoderator(%v) = %v; expected %v", comment, result, expected)
 	}
 }

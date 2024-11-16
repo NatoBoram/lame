@@ -16,12 +16,12 @@ type UserContext struct {
 	ExplanatoryComment string `xml:"ExplanatoryComment"`
 }
 
-func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) string {
+func MakeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) string {
 	context := UserContext{
 		PostTitle:          post.Post.Title,
 		PostUrl:            post.Post.URL,
 		PostBody:           post.Post.Body,
-		ExplanatoryComment: formatOpReply(opReply),
+		ExplanatoryComment: FormatOpReply(opReply),
 	}
 
 	contextXml, err := xml.Marshal(context)
@@ -32,7 +32,7 @@ func makeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) stri
 	return string(contextXml)
 }
 
-func formatOpReply(opReply *reddit.Comment) string {
+func FormatOpReply(opReply *reddit.Comment) string {
 	if opReply == nil {
 		return ""
 	}
@@ -53,7 +53,7 @@ func retryRemovalReason(
 		Messages: []openai.ChatCompletionMessage{
 			{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
 			{Role: openai.ChatMessageRoleAssistant, Content: automodComment.Body},
-			{Role: openai.ChatMessageRoleUser, Content: makeUserContext(post, opReply)},
+			{Role: openai.ChatMessageRoleUser, Content: MakeUserContext(post, opReply)},
 		},
 		Tools: []openai.Tool{
 			{Type: openai.ToolTypeFunction, Function: &remove},
@@ -63,7 +63,7 @@ func retryRemovalReason(
 		return nil, fmt.Errorf("failed to ask for another removal reason: %w", err)
 	}
 
-	_, removal, err := toolCall(resp)
+	_, removal, err := ToolCall(resp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get another removal reason: %w", err)
 	}

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	. "github.com/NatoBoram/lame"
-	"github.com/vartanbeno/go-reddit/v2/reddit"
+	"github.com/Sadzeih/go-reddit/reddit"
 )
 
 func TestGetPostId(t *testing.T) {

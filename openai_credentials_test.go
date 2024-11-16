@@ -38,3 +38,13 @@ func TestMarshalOpenAiCredentials(t *testing.T) {
 		t.Errorf("expected %s, got %s", expected, string(result))
 	}
 }
+
+func TestOpenAiCredentialsPath(t *testing.T) {
+	configDir := "/tmp/config/lame"
+	result := OpenAiCredentialsPath(configDir)
+
+	expected := "/tmp/config/lame/openai_credentials.json"
+	if result != expected {
+		t.Errorf("expected %s, got %s", expected, result)
+	}
+}

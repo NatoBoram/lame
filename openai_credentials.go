@@ -29,7 +29,7 @@ type OpenAiCredentials struct {
 }
 
 func readOpenAiCredentials(configDir string) (OpenAiCredentials, error) {
-	credsPath := openAiCredentialsPath(configDir)
+	credsPath := OpenAiCredentialsPath(configDir)
 
 	file, err := os.Open(credsPath)
 	if err != nil {

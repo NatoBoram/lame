@@ -42,3 +42,31 @@ func TestMarshalRedditCredentials(t *testing.T) {
 		t.Errorf("expected %s, got %s", expected, string(result))
 	}
 }
+
+func TestVerifyRedditCredentials(t *testing.T) {
+	validCreds := RedditCredentials{
+		ID:       "test-id",
+		Secret:   "test-secret",
+		Username: "test-username",
+		Password: "test-password",
+		Guide:    "test-guide",
+	}
+
+	if err := VerifyRedditCredentials(validCreds); err != nil {
+		t.Errorf("expected no error, got %v", err)
+	}
+
+	invalidCreds := []RedditCredentials{
+		{Secret: "test-secret", Username: "test-username", Password: "test-password", Guide: "test-guide"},
+		{ID: "test-id", Username: "test-username", Password: "test-password", Guide: "test-guide"},
+		{ID: "test-id", Secret: "test-secret", Password: "test-password", Guide: "test-guide"},
+		{ID: "test-id", Secret: "test-secret", Username: "test-username", Guide: "test-guide"},
+		{ID: "test-id", Secret: "test-secret", Username: "test-username", Password: "test-password"},
+	}
+
+	for _, creds := range invalidCreds {
+		if err := VerifyRedditCredentials(creds); err == nil {
+			t.Errorf("expected error, got nil for creds: %v", creds)
+		}
+	}
+}

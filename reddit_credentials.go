@@ -56,7 +56,7 @@ func readRedditCredentials(configDir string) (RedditCredentials, error) {
 		return creds, fmt.Errorf("failed to unmarshal Reddit credentials: %w", err)
 	}
 
-	err = verifyRedditCredentials(creds)
+	err = VerifyRedditCredentials(creds)
 	return creds, err
 }
 
@@ -88,7 +88,7 @@ func createRedditCredentials(credsPath string) error {
 	return err
 }
 
-func verifyRedditCredentials(creds RedditCredentials) error {
+func VerifyRedditCredentials(creds RedditCredentials) error {
 	var list []string
 
 	if creds.ID == "" {

@@ -29,7 +29,7 @@ type RedditCredentials struct {
 }
 
 func readRedditCredentials(configDir string) (RedditCredentials, error) {
-	credsPath := redditCredentialsPath(configDir)
+	credsPath := RedditCredentialsPath(configDir)
 
 	file, err := os.Open(credsPath)
 	if err != nil {
@@ -118,6 +118,6 @@ func VerifyRedditCredentials(creds RedditCredentials) error {
 	return nil
 }
 
-func redditCredentialsPath(configDir string) string {
+func RedditCredentialsPath(configDir string) string {
 	return filepath.Join(configDir, "reddit_credentials.json")
 }

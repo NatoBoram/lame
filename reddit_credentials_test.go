@@ -70,3 +70,13 @@ func TestVerifyRedditCredentials(t *testing.T) {
 		}
 	}
 }
+
+func TestRedditCredentialsPath(t *testing.T) {
+	configDir := "/tmp/config/lame"
+	result := RedditCredentialsPath(configDir)
+
+	expected := "/tmp/config/lame/reddit_credentials.json"
+	if result != expected {
+		t.Errorf("expected %s, got %s", expected, result)
+	}
+}

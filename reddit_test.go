@@ -95,3 +95,18 @@ func TestToRedditFeed(t *testing.T) {
 		}
 	}
 }
+
+func TestMaybeOptions_Empty(t *testing.T) {
+	result := MaybeOptions("")
+	if result != nil {
+		t.Errorf("MaybeOptions(\"\") = %v; expected nil", result)
+	}
+}
+
+func TestMaybeOptions_WithAfterToken(t *testing.T) {
+	result := MaybeOptions("after-token")
+	expected := &reddit.ListOptions{After: "after-token"}
+	if result == nil || *result != *expected {
+		t.Errorf("MaybeOptions(\"after-token\") = %v; expected %v", result, expected)
+	}
+}

@@ -169,7 +169,7 @@ func handleFeed(ctx context.Context,
 		spinner.Message(fmt.Sprintf("Getting %s feed...", feed))
 		spinner.Start()
 
-		opts := maybeOptions(after)
+		opts := MaybeOptions(after)
 		posts, _, err := getFeedPosts(ctx, redditClient, feed, opts)
 		if err != nil {
 			return fmt.Errorf("failed to get feed posts: %w", err)

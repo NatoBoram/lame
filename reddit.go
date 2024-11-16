@@ -105,7 +105,7 @@ func getFeedPosts(
 	}
 }
 
-func maybeOptions(after string) *reddit.ListOptions {
+func MaybeOptions(after string) *reddit.ListOptions {
 	if after == "" {
 		return nil
 	}

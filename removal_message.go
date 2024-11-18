@@ -6,7 +6,6 @@ var reasonToRule = map[RemovalReason]string{
 	ACTUAL_ANIMAL_ATTACK:                    "* **Rule 1 :** No actual animal attacks",
 	NO_EXPLANATORY_COMMENT:                  "* **Rule 3 :** Write an [explanatory comment](https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq)",
 	DOES_NOT_FIT_THE_SUBREDDIT:              "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme",
-	UNCIVIL_BEHAVIOUR:                       "* **Rule 5 :** Be civil",
 	LEOPARD_IN_TITLE_OR_EXPLANATORY_COMMENT: "* **Rule 6 :** No \"Leopards ate my face\" in the title nor explanatory comment",
 	DIRECT_LINK_TO_OTHER_SUBREDDIT:          "* **Rule 7 :** No direct links to other subreddits",
 	BAD_EXPLANATORY_COMMENT:                 "* **Rule 3 :** Write an [explanatory comment](https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq)\n\nYou wrote a comment, but it wasn't an [explanation](https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq).",

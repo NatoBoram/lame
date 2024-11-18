@@ -28,7 +28,6 @@ const (
 	LEOPARD_IN_TITLE_OR_EXPLANATORY_COMMENT RemovalReason = "leopard_in_title_or_explanatory_comment"
 	NO_CONSEQUENCES                         RemovalReason = "no_consequences"
 	NO_EXPLANATORY_COMMENT                  RemovalReason = "no_explanatory_comment"
-	UNCIVIL_BEHAVIOUR                       RemovalReason = "uncivil_behaviour"
 )
 
 // Trapped flairs were used to easily identify kinds of posts that were not

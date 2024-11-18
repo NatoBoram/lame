@@ -54,7 +54,6 @@ future_consequences: The consequences have not happened yet or are likely to hap
 leopard_in_title_or_explanatory_comment: The words "leopards", "ate" and "face" are forbidden in the title, body and explanatory comment
 no_consequences: There are no consequences in the post or explanatory comment
 no_explanatory_comment: The explanatory comment is empty
-uncivil_behaviour: The user is uncivil
 
 bye_bye_job: Someone did something and lost their job as a consequence, but losing their job isn't *necessarily* a consequence of what they did
 hypocrisy: Someone is being a hypocrite but they're not feeling any consequences of what they supported
@@ -73,7 +72,6 @@ sudden_betrayal: Someone was unpredictably betrayed by that they supported`,
 					string(LEOPARD_IN_TITLE_OR_EXPLANATORY_COMMENT),
 					string(NO_CONSEQUENCES),
 					string(NO_EXPLANATORY_COMMENT),
-					string(UNCIVIL_BEHAVIOUR),
 
 					// Trapped flairs
 					string(BYE_BYE_JOB),

@@ -116,5 +116,5 @@ func MaybeOptions(after string) *reddit.ListOptions {
 }
 
 func FormatAutomoderator(comment *reddit.Comment) aurora.Value {
-	return aurora.Green("u/" + comment.Author).Hyperlink("https://reddit.com/u/" + comment.Author)
+	return aurora.Index(Moderator, "u/"+comment.Author).Hyperlink("https://reddit.com/u/" + comment.Author)
 }

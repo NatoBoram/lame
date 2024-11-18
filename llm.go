@@ -27,7 +27,7 @@ func retryRemovalReason(
 ) (*Removal, error) {
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model:    model,
-		Messages: makeExplanatoryCompletion(guide, post, automodComment, opReply),
+		Messages: MakeExplanatoryCompletion(guide, post, automodComment, opReply),
 		Tools: []openai.Tool{
 			{Type: openai.ToolTypeFunction, Function: &remove},
 		},
@@ -44,14 +44,14 @@ func retryRemovalReason(
 	return removal, nil
 }
 
-func makeExplanatoryCompletion(
+func MakeExplanatoryCompletion(
 	guide *reddit.PostAndComments,
 	post *reddit.PostAndComments,
 	automodComment *reddit.Comment,
 	opReply *reddit.Comment,
 ) []openai.ChatCompletionMessage {
 	messages := []openai.ChatCompletionMessage{
-		{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
+		{Role: openai.ChatMessageRoleSystem, Content: SystemMessage},
 		{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Title},
 		{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Body},
 	}

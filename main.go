@@ -276,7 +276,7 @@ Body: %s
 	spinner.Start()
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model:    model,
-		Messages: makeExplanatoryCompletion(guide, post, automodComment, opReply),
+		Messages: MakeExplanatoryCompletion(guide, post, automodComment, opReply),
 		Tools:    modTools,
 	})
 	if err != nil {

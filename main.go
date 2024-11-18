@@ -233,8 +233,8 @@ Body: %s
 
 `,
 		aurora.Bold(post.Post.Title).Hyperlink(PermaLink(post.Post.Permalink)),
-		aurora.Gray(12, post.Post.Body),
 		aurora.Italic(post.Post.URL),
+		aurora.Gray(12, post.Post.Body),
 	)
 
 	automodComment, err := FindAutomodComment(post)
@@ -331,10 +331,10 @@ Body: %s
 			removal, err = retryRemovalReason(post, automodComment, opReply, ctx, model, openaiClient, guide)
 
 			if err != nil {
-				spinner.StopFailMessage(fmt.Sprintf("Failed to get another removal reason: %v\n", err))
+				spinner.StopFailMessage(fmt.Sprintf("Failed to get another removal reason: %v", err))
 				spinner.StopFail()
 			} else if removal != nil {
-				spinner.StopMessage(fmt.Sprintf("Got new removal reason: %s\n", removal.Reason))
+				spinner.StopMessage(fmt.Sprintf("Got new removal reason: %s", removal.Reason))
 				spinner.Stop()
 			} else {
 				spinner.StopFailMessage("Did not get a new removal reason")
@@ -373,7 +373,7 @@ Body: %s
 			if err != nil {
 				return fmt.Errorf("failed to submit removal reason: %w", err)
 			}
-			spinner.StopMessage(fmt.Sprintf("Removal reason added: %s\n", PermaLink(removalComment.Permalink)))
+			spinner.StopMessage(fmt.Sprintf("Removal reason added: %s", PermaLink(removalComment.Permalink)))
 			spinner.Stop()
 
 			spinner.Message("Distinguishing and stickying removal reason...")
@@ -383,6 +383,7 @@ Body: %s
 				return fmt.Errorf("failed to distinguish and sticky removal reason: %w", err)
 			}
 			spinner.StopMessage("Distinguished and stickied removal reason.")
+			spinner.Stop()
 		}
 
 	case "", "s", "skip":
@@ -393,6 +394,7 @@ Body: %s
 
 	}
 
+	fmt.Println("Done.")
 	fmt.Println()
 	return err
 }

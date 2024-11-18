@@ -16,6 +16,7 @@ The parameters of this function are goins to fill in the following template:
 > As a consequence of <something>, <consequences> happened to <someone>.
 
 Only approve the post if filling this template would result in a coherent and plausible explanation. Otherwise, remove it.`,
+	Strict: true,
 	Parameters: jsonschema.Definition{
 		Type: jsonschema.Object,
 		Properties: map[string]jsonschema.Definition{
@@ -32,13 +33,15 @@ Only approve the post if filling this template would result in a coherent and pl
 				Description: "The consequences of the thing that the person voted for, supported or wanted to impose on other people and that they're suffering from. If the consequences haven't happened yet, remove the post. Max 80 characters.",
 			},
 		},
-		Required: []string{"someone", "something", "consequences"},
+		Required:             []string{"someone", "something", "consequences"},
+		AdditionalProperties: false,
 	},
 }
 
 var remove = openai.FunctionDefinition{
 	Name:        "remove",
 	Description: "Remove a post when it corresponds to a removal reason",
+	Strict:      true,
 	Parameters: jsonschema.Definition{
 		Type: jsonschema.Object,
 		Properties: map[string]jsonschema.Definition{
@@ -46,21 +49,21 @@ var remove = openai.FunctionDefinition{
 				Type: jsonschema.String,
 				Description: `These are the removal reasons of the subreddit. If the post fits one of these, remove it.
 
-bad_explanatory_comment: It is impossible to identify who supported something or what they supported or what are the consequences from the explanatory comment
-direct_link_to_other_subreddit: Contains a reference to another subreddit
-distinct_enabler_and_victim: The person who supported something is not the same person as the one who receives the consequences
+bad_explanatory_comment: It is impossible to identify who supported something or what they supported or what are the consequences from the explanatory comment.
+direct_link_to_other_subreddit: Contains a reference to another subreddit.
+distinct_enabler_and_victim: The person who supported something is not the same person as the one who receives the consequences. For example, parents not vaccinating their child and then that child getting sick. The child is an innocent victim of what their parents imposed on them.
 does_not_fit_the_subreddit: The post is not about someone who's suffering consequences from something they voted for or supported or wanted to impose on other people.
-future_consequences: The consequences have not happened yet or are likely to happen
-leopard_in_title_or_explanatory_comment: The words "leopards", "ate" and "face" are forbidden in the title, body and explanatory comment
-no_consequences: There are no consequences in the post or explanatory comment
-no_explanatory_comment: The explanatory comment is empty
+future_consequences: The consequences have not happened yet. They are likely to happen in the future or they may happen in the future, but it didn't happen yet.
+leopard_in_title_or_explanatory_comment: The words "leopards", "ate" and "face" and all their derivatives are forbidden in the title, body and explanatory comment. For example, no cats munching on visages either.
+no_consequences: There are no consequences in the post or explanatory comment. For example, being shocked, feeling regrets and getting criticized aren't consequences.
+no_explanatory_comment: The explanatory comment is empty.
 
-bye_bye_job: Someone did something and lost their job as a consequence, but losing their job isn't *necessarily* a consequence of what they did
-hypocrisy: Someone is being a hypocrite but they're not feeling any consequences of what they supported
-lesser_of_two_evils: Someone voted for something terrible, but that's only because the other choice was something even worse
-self_aware_wolf: Someone accidentally describes themselves but they're not self-aware enough to realize it
-stupidity: Someone is being stupid, but there's no schadenfreude to be had
-sudden_betrayal: Someone was unpredictably betrayed by that they supported`,
+bye_bye_job: Someone did something and lost their job as a consequence, but losing their job isn't a consequence of what they supported. For example, someone was fired for not getting vaccinated, but they didn't support firing people for not getting vaccinated.
+hypocrisy: Someone is being a hypocrite but they're not receiving any consequences of what they supported.
+lesser_of_two_evils: Someone voted for something terrible, but that's only because the other choice was something even worse.
+self_aware_wolf: Someone accidentally describes themselves but they're not self-aware enough to realize it.
+stupidity: Someone is being stupid, but there's no schadenfreude to be had.
+sudden_betrayal: Someone was unpredictably betrayed by what they supported.`,
 				Enum: []string{
 					// Removal reasons
 					string(ACTUAL_ANIMAL_ATTACK),
@@ -83,7 +86,8 @@ sudden_betrayal: Someone was unpredictably betrayed by that they supported`,
 				},
 			},
 		},
-		Required: []string{"reason"},
+		Required:             []string{"reason"},
+		AdditionalProperties: false,
 	},
 }
 

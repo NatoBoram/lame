@@ -286,7 +286,7 @@ Body: %s
 	spinner.Stop()
 	fmt.Println()
 
-	_, removal, err := suggest(resp)
+	approval, removal, err := suggest(resp)
 	if err != nil {
 		return fmt.Errorf("failed to suggest approval or removal: %w", err)
 	}
@@ -326,19 +326,11 @@ Body: %s
 	case "r", "remove":
 
 		if removal == nil {
-			spinner.Message("Getting new removal reason...")
-			spinner.Start()
-			removal, err = retryRemovalReason(post, automodComment, opReply, ctx, model, openaiClient, guide)
 
+			removal, err = retryRemovalReason(post, automodComment, opReply, ctx,
+				model, openaiClient, guide, resp, approval, spinner)
 			if err != nil {
-				spinner.StopFailMessage(fmt.Sprintf("Failed to get another removal reason: %v", err))
-				spinner.StopFail()
-			} else if removal != nil {
-				spinner.StopMessage(fmt.Sprintf("Got new removal reason: %s", removal.Reason))
-				spinner.Stop()
-			} else {
-				spinner.StopFailMessage("Did not get a new removal reason")
-				spinner.StopFail()
+				return fmt.Errorf("failed to retry for a removal reason: %w", err)
 			}
 
 			ok, err := confirmNewRemovalReason()

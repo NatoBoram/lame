@@ -77,7 +77,7 @@ func main() {
 		panic(err)
 	}
 	spinner.StopMessage(fmt.Sprintf("Logged in as %s",
-		aurora.Red("u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name),
+		aurora.Index(Orangered, "u/"+user.Name).Hyperlink("https://reddit.com/u/"+user.Name),
 	))
 	spinner.Stop()
 
@@ -217,19 +217,19 @@ func handlePost(ctx context.Context,
 	postId string,
 	spinner *yacspin.Spinner,
 ) error {
-	spinner.Message(fmt.Sprintf("Getting post %s...", postId))
+	spinner.Message(fmt.Sprintf("Getting post %s...", aurora.Index(Orangered, postId)))
 	spinner.Start()
 	post, _, err := redditClient.Post.Get(ctx, postId)
 	if err != nil {
 		return fmt.Errorf("failed to get post: %w", err)
 	}
-	spinner.StopMessage(fmt.Sprintf("Got post %s.", postId))
+	spinner.StopMessage(fmt.Sprintf("Got post %s.", aurora.Index(Orangered, postId)))
 	spinner.Stop()
 
 	fmt.Printf(`
 Title: %s
-Body: %s
 URL: %s
+Body: %s
 
 `,
 		aurora.Bold(post.Post.Title).Hyperlink(PermaLink(post.Post.Permalink)),
@@ -263,11 +263,11 @@ URL: %s
 
 	if opReply != nil {
 		fmt.Printf(`Found %s by %s
-Body: %s
+%s
 
 `,
 			aurora.Hyperlink("explanatory comment", PermaLink(opReply.Permalink)),
-			aurora.Red("u/"+opReply.Author).Hyperlink("https://reddit.com/u/"+opReply.Author),
+			aurora.Index(Orangered, "u/"+opReply.Author).Hyperlink("https://reddit.com/u/"+opReply.Author),
 			aurora.Gray(12, opReply.Body),
 		)
 	}
@@ -275,13 +275,9 @@ Body: %s
 	spinner.Message("Requesting a suggestion...")
 	spinner.Start()
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-		Model: model,
-		Messages: []openai.ChatCompletionMessage{
-			{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
-			{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Body},
-			{Role: openai.ChatMessageRoleUser, Content: MakeUserContext(post, opReply)},
-		},
-		Tools: modTools,
+		Model:    model,
+		Messages: makeExplanatoryCompletion(guide, post, automodComment, opReply),
+		Tools:    modTools,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create chat completion: %w", err)
@@ -328,39 +324,37 @@ Body: %s
 		spinner.Stop()
 
 	case "r", "remove":
+
 		if removal == nil {
 			spinner.Message("Getting new removal reason...")
 			spinner.Start()
-			removal, err = retryRemovalReason(post, automodComment, opReply, ctx, model, openaiClient)
+			removal, err = retryRemovalReason(post, automodComment, opReply, ctx, model, openaiClient, guide)
+
 			if err != nil {
-				spinner.StopFailMessage(
-					fmt.Sprintf("Failed to get another removal reason: %v\n", err),
-				)
+				spinner.StopFailMessage(fmt.Sprintf("Failed to get another removal reason: %v\n", err))
+				spinner.StopFail()
+			} else if removal != nil {
+				spinner.StopMessage(fmt.Sprintf("Got new removal reason: %s\n", removal.Reason))
+				spinner.Stop()
+			} else {
+				spinner.StopFailMessage("Did not get a new removal reason")
 				spinner.StopFail()
 			}
 
-			if removal != nil {
-				spinner.StopMessage(fmt.Sprintf("Got new removal reason: %s\n", removal.Reason))
-				spinner.Stop()
-
-				ok, err := confirmNewRemovalReason()
-				if err != nil {
-					return fmt.Errorf("failed to confirm new removal reason: %w", err)
-				}
-				if !ok {
-					fmt.Println("Skipped.")
-					fmt.Println()
-					return nil
-				}
+			ok, err := confirmNewRemovalReason()
+			if err != nil {
+				return fmt.Errorf("failed to confirm new removal reason: %w", err)
 			}
-
-			spinner.StopFailMessage("Did not get a new removal reason")
-			spinner.StopFail()
+			if !ok {
+				fmt.Println("Skipped.")
+				fmt.Println()
+				return nil
+			}
 		}
 
 		spinner.Message("Removing...")
 		spinner.Start()
-		_, err := redditClient.Moderation.Remove(ctx, post.Post.FullID)
+		_, err = redditClient.Moderation.Remove(ctx, post.Post.FullID)
 		if err != nil {
 			return fmt.Errorf("failed to remove post: %w", err)
 		}

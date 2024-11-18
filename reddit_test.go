@@ -116,7 +116,7 @@ func TestFormatAutomoderator(t *testing.T) {
 	comment := &reddit.Comment{Author: "AutoModerator"}
 	result := FormatAutomoderator(comment)
 
-	expected := aurora.Green("u/AutoModerator").Hyperlink("https://reddit.com/u/AutoModerator")
+	expected := aurora.Index(Moderator, "u/AutoModerator").Hyperlink("https://reddit.com/u/AutoModerator")
 	if result.Value() != expected.Value() {
 		t.Errorf("FormatAutomoderator(%v) = %v; expected %v", comment, result, expected)
 	}

@@ -2,35 +2,11 @@ package main
 
 import (
 	"context"
-	"encoding/xml"
 	"fmt"
 
 	"github.com/Sadzeih/go-reddit/reddit"
 	openai "github.com/sashabaranov/go-openai"
 )
-
-type UserContext struct {
-	PostTitle          string `xml:"PostTitle"`
-	PostUrl            string `xml:"PostUrl"`
-	PostBody           string `xml:"PostBody"`
-	ExplanatoryComment string `xml:"ExplanatoryComment"`
-}
-
-func MakeUserContext(post *reddit.PostAndComments, opReply *reddit.Comment) string {
-	context := UserContext{
-		PostTitle:          post.Post.Title,
-		PostUrl:            post.Post.URL,
-		PostBody:           post.Post.Body,
-		ExplanatoryComment: FormatOpReply(opReply),
-	}
-
-	contextXml, err := xml.Marshal(context)
-	if err != nil {
-		return fmt.Sprintf("failed to marshal user context: %v", err)
-	}
-
-	return string(contextXml)
-}
 
 func FormatOpReply(opReply *reddit.Comment) string {
 	if opReply == nil {
@@ -47,14 +23,11 @@ func retryRemovalReason(
 	ctx context.Context,
 	model string,
 	openaiClient *openai.Client,
+	guide *reddit.PostAndComments,
 ) (*Removal, error) {
 	resp, err := openaiClient.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-		Model: model,
-		Messages: []openai.ChatCompletionMessage{
-			{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
-			{Role: openai.ChatMessageRoleAssistant, Content: automodComment.Body},
-			{Role: openai.ChatMessageRoleUser, Content: MakeUserContext(post, opReply)},
-		},
+		Model:    model,
+		Messages: makeExplanatoryCompletion(guide, post, automodComment, opReply),
 		Tools: []openai.Tool{
 			{Type: openai.ToolTypeFunction, Function: &remove},
 		},
@@ -69,4 +42,50 @@ func retryRemovalReason(
 	}
 
 	return removal, nil
+}
+
+func makeExplanatoryCompletion(
+	guide *reddit.PostAndComments,
+	post *reddit.PostAndComments,
+	automodComment *reddit.Comment,
+	opReply *reddit.Comment,
+) []openai.ChatCompletionMessage {
+	messages := []openai.ChatCompletionMessage{
+		{Role: openai.ChatMessageRoleSystem, Content: systemMessage},
+		{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Title},
+		{Role: openai.ChatMessageRoleAssistant, Content: guide.Post.Body},
+	}
+
+	if post.Post.Title != "" {
+		messages = append(messages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: post.Post.Title,
+		})
+	}
+
+	if post.Post.URL != "" {
+		messages = append(messages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: post.Post.URL,
+		})
+	}
+
+	if post.Post.Body != "" {
+		messages = append(messages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: post.Post.Body,
+		})
+	}
+
+	messages = append(messages, openai.ChatCompletionMessage{
+		Role:    openai.ChatMessageRoleAssistant,
+		Content: automodComment.Body,
+	})
+
+	messages = append(messages, openai.ChatCompletionMessage{
+		Role:    openai.ChatMessageRoleUser,
+		Content: FormatOpReply(opReply),
+	})
+
+	return messages
 }

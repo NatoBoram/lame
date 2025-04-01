@@ -1,11 +1,10 @@
 module github.com/NatoBoram/lame
 
 go 1.23.1
-
 require (
 	github.com/Sadzeih/go-reddit v1.0.1-0.20241115072519-466f9c294e8f
 	github.com/logrusorgru/aurora/v4 v4.0.0
-	github.com/sashabaranov/go-openai v1.38.0
+	github.com/sashabaranov/go-openai v1.38.1
 	github.com/theckman/yacspin v0.13.12
 )
 

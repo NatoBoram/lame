@@ -65,10 +65,15 @@ messages:
   - role: user
     content: "{{explanation}}"
 testData:
-  - author: 718Brooklyn
-    title: My MAGA Sister in Law Just Got This After Accepting a Job with the IRS
-    url: https://preview.redd.it/my-maga-sister-in-law-just-got-this-after-accepting-a-job-v0-iyp4xnhfceee1.jpeg?width=1080&crop=smart&auto=webp&s=00e50d34b343df787e4fc1d9a92f0b750f9296f2
-    explanation: |
+  # - author: 718Brooklyn
+  #   title: My MAGA Sister in Law Just Got This After Accepting a Job with the IRS
+  #   url: https://preview.redd.it/my-maga-sister-in-law-just-got-this-after-accepting-a-job-v0-iyp4xnhfceee1.jpeg?width=1080&crop=smart&auto=webp&s=00e50d34b343df787e4fc1d9a92f0b750f9296f2
+  #   explanation: |
+  #     My sister in law, who voted for Trump, was excited about starting her job with the IRS.
+
+  #     Womp womp
+  #   expected: Approved
+  - input: |
       My sister in law, who voted for Trump, was excited about starting her job with the IRS.
 
       Womp womp

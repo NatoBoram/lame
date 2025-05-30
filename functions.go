@@ -26,11 +26,11 @@ Only approve the post if filling this template would result in a coherent and pl
 			},
 			"something": {
 				Type:        jsonschema.String,
-				Description: "The thing that the person voted for, supported or wanted to impose on other people. Max 80 characters.",
+				Description: "The thing that the person voted for, supported or wanted to impose on other people. Max 40 characters.",
 			},
 			"consequences": {
 				Type:        jsonschema.String,
-				Description: "The consequences of the thing that the person voted for, supported or wanted to impose on other people and that they're suffering from. If the consequences haven't happened yet, remove the post. Max 80 characters.",
+				Description: "The consequences of the thing that the person voted for, supported or wanted to impose on other people and that they're suffering from. If the consequences haven't happened yet, remove the post. Max 40 characters.",
 			},
 		},
 		Required:             []string{"someone", "something", "consequences"},
@@ -53,7 +53,7 @@ bad_explanatory_comment: It is impossible to identify who supported something or
 direct_link_to_other_subreddit: Contains a reference to another subreddit.
 distinct_enabler_and_victim: The person who supported something is not the same person as the one who receives the consequences. For example, parents not vaccinating their child and then that child getting sick. The child is an innocent victim of what their parents imposed on them.
 does_not_fit_the_subreddit: The post is not about someone who's suffering consequences from something they voted for or supported or wanted to impose on other people.
-future_consequences: The consequences have not happened yet. They are likely to happen in the future or they may happen in the future, but it didn't happen yet.
+future_consequences: The consequences have not happened yet. They may be likely to maybe potentially happen in the future, but they didn't happen yet.
 leopard_in_title_or_explanatory_comment: The words "leopards", "ate" and "face" and all their derivatives are forbidden in the title, body and explanatory comment. For example, no cats munching on visages either.
 no_consequences: There are no consequences in the post or explanatory comment. For example, being shocked, feeling regrets and getting criticized aren't consequences.
 no_explanatory_comment: The explanatory comment is empty.

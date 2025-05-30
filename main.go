@@ -203,7 +203,8 @@ func handlePage(
 
 		err := handlePost(ctx, redditClient, guide, openaiClient, model, post.ID, spinner)
 		if err != nil {
-			return fmt.Errorf("failed to handle post: %w", err)
+			fmt.Printf("Failed to handle post: %v\n", err)
+			continue
 		}
 	}
 

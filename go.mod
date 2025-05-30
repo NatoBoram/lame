@@ -1,6 +1,6 @@
 module github.com/NatoBoram/lame
 
-go 1.23.1
+go 1.24.3
 
 require (
 	github.com/Sadzeih/go-reddit v1.0.1-0.20241115072519-466f9c294e8f
@@ -18,5 +18,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 )

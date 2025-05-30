@@ -11,7 +11,7 @@ var reasonToRule = map[RemovalReason]string{
 	BAD_EXPLANATORY_COMMENT:                 "* **Rule 3 :** Write an [explanatory comment](https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq)\n\nYou wrote a comment, but it wasn't an [explanation](https://www.reddit.com/r/LeopardsAteMyFace/comments/lt8zlq).",
 	DISTINCT_ENABLER_AND_VICTIM:             "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThe enabler and the victim must be the same person.",
 	FUTURE_CONSEQUENCES:                     "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThis is not a subreddit of the future. The consequences must have already happened.",
-	NO_CONSEQUENCES:                         "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThere are no consequences in your post.",
+	NO_CONSEQUENCES:                         "* **Rule 4 :** Must follow the \"Leopard ate my face\" theme\n\nThere are no consequences in your post. Being shocked, feeling regrets, getting criticized and panicking are not consequences. A consequence refers to a real-world event that has actually happened to someone.",
 }
 
 func FlairToRemovalReason(removalReason RemovalReason) RemovalReason {
